@@ -13,6 +13,7 @@ import NewFaculty from '@/components/Faculties/NewFaculty.vue'
 import NewDepartments from '@/components/Departmens/NewDepartment.vue'
 import NewSpeciality from '@/components/Specialties/NewSpeciality.vue'
 import NewKnowledgeBranches from '@/components/KnowledgeBranches/NewKnowledgeBranches.vue'
+import NewGroups from '@/components/Groups/NewGroups.vue'
 
 Vue.use(Router)
 
@@ -68,6 +69,12 @@ export default new Router({
       path: '/create/knowledge-branches',
       name: 'NewKnowledgeBranches',
       component: NewKnowledgeBranches,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/create/groups',
+      name: 'NewGroups',
+      component: NewGroups,
       beforeEnter: AuthGuard
     }
   ],

@@ -4,19 +4,17 @@
       <v-flex xs12 sm6 offset-sm3>
         <h1 class="text--secondary mb-3">Добавить Новую Кафедру</h1>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field name="name"
-                        label="Название Кафедры"
+          <v-text-field name="alias"
+                        label="Алиас группы"
                         type="text"
                         required
-                        :rules="[v => !!v || 'Название Кафедры обязательно']"
-                        v-model="name">
+                        :rules="[v => !!v || 'Алиас групппы обязателен']"
+                        v-model="alias">
           </v-text-field>
-          <v-text-field name="chief"
-                        label="Заведующий кафедры"
+          <v-text-field name="name"
+                        label="Полное название группы"
                         type="text"
-                        required
-                        :rules="[v => !!v || 'Имя Заведующего Кафедры обязательно']"
-                        v-model="chief">
+                        v-model="name">
           </v-text-field>
           <v-select :items="faculties"
                     v-model="facultyId"
@@ -25,23 +23,23 @@
         </v-form>
         <v-btn :disabled="!valid"
                 class="success mb-3"
-                @click="createDepartment">
-              Добавить кафедру
+                @click="createGroup">
+              Добавить группу
         </v-btn>
         <v-layout row>
           <v-flex xs12>
             <v-list>
               <v-list-tile
-                v-for="(item, index) in departments"
-                :key="`faculty-${index}`">
+                v-for="(item, index) in groups"
+                :key="`group-${index}`">
 
                 <v-list-tile-action>
                   <v-icon color="green">star</v-icon>
                 </v-list-tile-action>
 
                 <v-list-tile-content>
-                  <v-list-tile-title v-text="`Кафедра ${item.name}`"></v-list-tile-title>
-                  <v-list-tile-sub-title v-html="item.chief"></v-list-tile-sub-title>
+                  <v-list-tile-title v-text="`Группа ${item.alias}`"></v-list-tile-title>
+                  <v-list-tile-sub-title v-html="item.name"></v-list-tile-sub-title>
                 </v-list-tile-content>
 
               </v-list-tile>
@@ -56,8 +54,8 @@
 export default {
   data () {
     return {
+      alias: '',
       name: '',
-      chief: '',
       facultyId: null,
       valid: false
     }
@@ -71,25 +69,25 @@ export default {
         }
       })
     },
-    departments () {
-      return this.$store.getters.departments
+    groups () {
+      return this.$store.getters.groups
     }
   },
   methods: {
-    createDepartment () {
+    createGroup () {
       if (this.$refs.form.validate()) {
         const department = {
+          alias: this.alias,
           name: this.name,
-          chief: this.chief,
           facultyId: this.facultyId
         }
-        this.$store.dispatch('createDepartment', department)
+        this.$store.dispatch('createGroup', department)
         this.clearFields()
       }
     },
     clearFields () {
+      this.alias = ''
       this.name = ''
-      this.chief = ''
       this.facultyId = null
     }
   }

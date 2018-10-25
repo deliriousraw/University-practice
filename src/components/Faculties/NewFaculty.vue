@@ -5,7 +5,7 @@
         <h1 class="text--secondary mb-3">Добавить Новый Факультет</h1>
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field name="name"
-                        label="name"
+                        label="Факультет"
                         type="text"
                         required
                         :rules="[v => !!v || 'Название факультета обязательно']"

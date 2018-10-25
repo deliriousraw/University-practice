@@ -70,7 +70,8 @@ export default {
           {title: 'Факультеты', icon: 'add', url: '/create/faculty'},
           {title: 'Кафедры', icon: 'add', url: '/create/departments'},
           {title: 'Специальности', icon: 'add', url: '/create/speciality'},
-          {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'}
+          {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
+          {title: 'Группы', icon: 'add', url: '/create/groups'}
         ]
       } else {
         return [

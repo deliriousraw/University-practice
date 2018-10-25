@@ -27,10 +27,10 @@
 
         </v-form>
          <v-btn :disabled="!valid"
-                  class="success mb-3"
-                  @click="createSpeciality">
+                class="success mb-3"
+                @click="createSpeciality">
               Добавить специальность
-            </v-btn>
+        </v-btn>
         <v-layout row>
           <v-flex xs12>
             <v-list>
