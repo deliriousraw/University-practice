@@ -53,6 +53,9 @@ export default {
   getters: {
     specialties (state) {
       return state.specialties
+    },
+    getSpecialtyById: state => id => {
+      return state.specialties.find(specialty => specialty.id === id)
     }
   }
 }

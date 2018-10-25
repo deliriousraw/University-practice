@@ -52,6 +52,9 @@ export default {
   getters: {
     groups (state) {
       return state.groups
+    },
+    getGroupById: state => id => {
+      return state.groups.find(group => group.id === id)
     }
   }
 }

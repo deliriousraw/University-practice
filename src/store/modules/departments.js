@@ -52,6 +52,9 @@ export default {
   getters: {
     departments (state) {
       return state.departments
+    },
+    getDepartmentById: state => id => {
+      return state.departments.find(department => department.id === id)
     }
   }
 }

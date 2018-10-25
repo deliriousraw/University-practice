@@ -57,7 +57,7 @@
                       :close-on-content-click="false"
                       v-model="startDateMenu"
                       :nudge-right="40"
-                      :return-value.sync="date"
+                      :return-value.sync="startDate"
                       lazy
                       transition="scale-transition"
                       offset-y
@@ -72,7 +72,7 @@
                 <v-date-picker v-model="startDate" no-title scrollable locale="ru-Ru">
                   <v-spacer></v-spacer>
                   <v-btn flat color="primary" @click="startDateMenu = false">Cancel</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu.save(startDate)">OK</v-btn>
                 </v-date-picker>
               </v-menu>
             </v-flex>
@@ -81,7 +81,7 @@
                       :close-on-content-click="false"
                       v-model="finishDateMenu"
                       :nudge-right="40"
-                      :return-value.sync="date"
+                      :return-value.sync="finishDate"
                       lazy
                       transition="scale-transition"
                       offset-y
@@ -96,14 +96,14 @@
                 <v-date-picker v-model="finishDate" no-title scrollable locale="ru-Ru">
                   <v-spacer></v-spacer>
                   <v-btn flat color="primary" @click="finishDate = false">Cancel</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu2.save(date)">OK</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu2.save(finishDate)">OK</v-btn>
                 </v-date-picker>
               </v-menu>
             </v-flex>
           </v-layout>
           <v-btn :disabled="!facultyID"
                   class="success mb-3"
-                  @click="createApplication">
+                  @click="createApplication()">
               Создать «Наказ»
         </v-btn>
       </v-flex>
@@ -111,6 +111,9 @@
   </v-container>
 </template>
 <script>
+import * as docx from 'docx'
+import saveAs from 'file-saver'
+
 export default {
   data () {
     return {
@@ -163,7 +166,27 @@ export default {
   },
   methods: {
     createApplication () {
+      const faculty = this.$store.getters.getFacultiesById(this.facultyID)
+      const department = this.$store.getters.getDepartmentById(this.departmentID)
+      const group = this.$store.getters.getGroupById(this.groupID)
 
+      const doc = new docx.Document({
+        creator: 'НТУ',
+        title: 'Наказ',
+        description: `Наказ про проходження практики студентами групи ${group.alias}-${this.groupCourse}-${this.groupNumber}`
+      })
+      doc.Styles.createParagraphStyle('Paragraph', 'Common paragraph')
+        .basedOn('Normal')
+        .next('Normal')
+        .color('999999')
+
+      doc.createParagraph(`${faculty.name} ${department.name} ${group.alias}`)
+
+      const packer = new docx.Packer()
+
+      packer.toBlob(doc).then((blob) => {
+        saveAs(blob, `Наказ для ${group.alias}-${this.groupCourse}-${this.groupNumber}.docx`)
+      })
     }
   }
 }
