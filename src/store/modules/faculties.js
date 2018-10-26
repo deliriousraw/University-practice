@@ -34,7 +34,8 @@ export default {
           querySnapshot.forEach((doc) => {
             faculties.push({
               id: doc.id,
-              name: doc.data().name
+              name: doc.data().name,
+              chief: doc.data().dekan
             })
           })
         })
