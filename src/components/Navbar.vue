@@ -2,7 +2,7 @@
     <div>
         <v-navigation-drawer app temporary v-model="sideNavVisibility">
           <v-list>
-            <v-list-tile v-for="(link, index) in links"
+            <v-list-tile v-for="(link, index) in (links.common)"
                          :key="`link-${index}`"
                          :to="link.url">
               <v-list-tile-action>
@@ -14,6 +14,26 @@
               </v-list-tile-content>
 
             </v-list-tile>
+            <v-list-group  prepend-icon="account_circle"
+                           value="true">
+
+              <v-list-tile slot="activator">
+                <v-list-tile-title>Редагування</v-list-tile-title>
+              </v-list-tile>
+
+              <v-list-tile v-for="(link, index) in (links.dropdown)"
+                         :key="`link-${index}`"
+                         :to="link.url">
+                <v-list-tile-action>
+                  <v-icon>{{link.icon}}</v-icon>
+                </v-list-tile-action>
+
+                <v-list-tile-content>
+                  <v-list-tile-title v-text="link.title"></v-list-tile-title>
+                </v-list-tile-content>
+
+              </v-list-tile>
+            </v-list-group>
             <v-list-tile v-if="isUserLoggedIn" @click="onLogout">
               <v-list-tile-action>
                 <v-icon>exit_to_app</v-icon>
@@ -31,13 +51,34 @@
             <v-toolbar-title>Students Pratice</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items class="hidden-sm-and-down">
-              <v-btn v-for="(link, index) in links"
+              <v-btn v-for="(link, index) in links.common"
                      :key="`link-${index}`"
                      :to="link.url"
                      flat>
                      <v-icon left>{{link.icon}}</v-icon>
                      {{link.title}}
               </v-btn>
+              <v-menu bottom left>
+                <v-btn slot="activator"
+                       dark
+                       icon>
+                  <v-icon>more_vert</v-icon>
+                </v-btn>
+                <v-list>
+                  <v-list-tile v-for="(link, index) in links.dropdown"
+                              :key="`link-${index}`"
+                              :to="link.url">
+                    <v-list-tile-action>
+                      <v-icon>{{link.icon}}</v-icon>
+                    </v-list-tile-action>
+
+                    <v-list-tile-content>
+                      <v-list-tile-title v-text="link.title"></v-list-tile-title>
+                    </v-list-tile-content>
+
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
               <v-btn v-if="isUserLoggedIn" @click="onLogout" flat>
                 <v-icon left>exit_to_app</v-icon>
                 Выйти
@@ -64,15 +105,20 @@ export default {
     },
     links () {
       if (this.isUserLoggedIn) {
-        return [
-          {title: 'Приказы', icon: 'create', url: '/create/application'},
-          {title: 'Отчеты', icon: 'add', url: '/create/report'},
-          {title: 'Факультеты', icon: 'add', url: '/create/faculty'},
-          {title: 'Кафедры', icon: 'add', url: '/create/departments'},
-          {title: 'Специальности', icon: 'add', url: '/create/speciality'},
-          {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
-          {title: 'Группы', icon: 'add', url: '/create/groups'}
-        ]
+        return {
+          common: [
+            {title: 'Приказы', icon: 'create', url: '/create/application'},
+            {title: 'Отчеты', icon: 'add', url: '/create/report'},
+            {title: 'Список студентов', icon: 'add', url: '/create/students'}
+          ],
+          dropdown: [
+            {title: 'Факультеты', icon: 'add', url: '/create/faculty'},
+            {title: 'Кафедры', icon: 'add', url: '/create/departments'},
+            {title: 'Специальности', icon: 'add', url: '/create/speciality'},
+            {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
+            {title: 'Группы', icon: 'add', url: '/create/groups'}
+          ]
+        }
       } else {
         return [
           {title: 'Войти', icon: 'account_box', url: '/login'},

@@ -7,6 +7,7 @@ import departments from './modules/departments'
 import specialties from './modules/specialties'
 import knowledgeBranches from './modules/knowledgeBranches'
 import groups from './modules/groups'
+import students from './modules/students'
 
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     departments,
     specialties,
     knowledgeBranches,
-    groups
+    groups,
+    students
   }
 })
