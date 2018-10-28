@@ -50,7 +50,7 @@
             <v-toolbar-side-icon class="hidden-md-and-up" @click="sideNavVisibility = !sideNavVisibility"></v-toolbar-side-icon>
             <v-toolbar-title>Students Pratice</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-toolbar-items class="hidden-sm-and-down">
+            <v-toolbar-items v-if="isUserLoggedIn" class="hidden-sm-and-down">
               <v-btn v-for="(link, index) in links.common"
                      :key="`link-${index}`"
                      :to="link.url"
@@ -84,6 +84,15 @@
                 Выйти
               </v-btn>
             </v-toolbar-items>
+            <v-toolbar-items v-if="!isUserLoggedIn" class="hidden-sm-and-down">
+              <v-btn v-for="(link, index) in links"
+                     :key="`link-${index}`"
+                     :to="link.url"
+                     flat>
+                     <v-icon left>{{link.icon}}</v-icon>
+                     {{link.title}}
+              </v-btn>
+            </v-toolbar-items>
         </v-toolbar>
         <v-content>
 
@@ -109,14 +118,15 @@ export default {
           common: [
             {title: 'Приказы', icon: 'create', url: '/create/application'},
             {title: 'Отчеты', icon: 'add', url: '/create/report'},
-            {title: 'Список студентов', icon: 'add', url: '/create/students'}
+            {title: 'Список студентов', icon: 'add', url: '/students'}
           ],
           dropdown: [
             {title: 'Факультеты', icon: 'add', url: '/create/faculty'},
             {title: 'Кафедры', icon: 'add', url: '/create/departments'},
             {title: 'Специальности', icon: 'add', url: '/create/speciality'},
             {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
-            {title: 'Группы', icon: 'add', url: '/create/groups'}
+            {title: 'Группы', icon: 'add', url: '/create/groups'},
+            {title: 'Студент', icon: 'add', url: '/create/students'}
           ]
         }
       } else {

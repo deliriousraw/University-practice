@@ -8,6 +8,7 @@ import Register from '@/components/Auth/Register.vue'
 
 import ApplicationForm from '@/components/Reports/ApplicationForm.vue'
 import ReportForm from '@/components/Reports/ReportForm.vue'
+import StudentsList from '@/components/Students/StudentsList.vue'
 
 import NewFaculty from '@/components/Faculties/NewFaculty.vue'
 import NewDepartments from '@/components/Departmens/NewDepartment.vue'
@@ -82,6 +83,12 @@ export default new Router({
       path: '/create/students',
       name: 'NewStudent',
       component: NewStudent,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/students',
+      name: 'StudentsList',
+      component: StudentsList,
       beforeEnter: AuthGuard
     }
   ],

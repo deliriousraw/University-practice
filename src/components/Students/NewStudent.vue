@@ -110,45 +110,17 @@
                 @click="createStudent">
               Добавить студента
         </v-btn>
-        <!-- <v-layout row>
-          <v-flex xs12>
-            <v-card>
-              <v-card-title>
-                Студенты
-                <v-spacer></v-spacer>
-                <v-text-field
-                  v-model="search"
-                  append-icon="search"
-                  label="Знайти студента"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="desserts"
-                :search="search">
-
-                <template slot="items" slot-scope="props">
-                  <td>{{ props.item.name }}</td>
-                  <td class="text-xs-right">{{ props.item.calories }}</td>
-                  <td class="text-xs-right">{{ props.item.fat }}</td>
-                  <td class="text-xs-right">{{ props.item.carbs }}</td>
-                  <td class="text-xs-right">{{ props.item.protein }}</td>
-                  <td class="text-xs-right">{{ props.item.iron }}</td>
-                </template>
-                <v-alert slot="no-results" :value="true" color="error" icon="warning">
-                  Your search for "{{ search }}" found no results.
-                </v-alert>
-              </v-data-table>
-            </v-card>
-          </v-flex>
-        </v-layout> -->
+        <!-- ФУНКЦИЯ ДЛЯ ИМПОРТА В БАЗУ FIREBASE // -->
+        <!-- <v-btn  class="success mb-3"
+                @click="uploadStudents">
+              Добавить в firebase
+        </v-btn> -->
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 <script>
+// import studData from './4 course.json'
 export default {
   data () {
     return {
@@ -168,11 +140,14 @@ export default {
     }
   },
   computed: {
+    // dataFromJson () {
+    //   return studData.students
+    // },
     students () {
       return this.$store.getters.students.map(student => {
         return {
           id: student.id,
-          fio: student.name,
+          fio: student.fio,
           facultyID: student.facultyID,
           groupID: student.groupID,
           specialtyID: student.specialtyID,
@@ -211,6 +186,9 @@ export default {
           text: `${specialty.code} ${specialty.name}`,
           value: specialty.id
         }
+      }).push({
+        text: `Без специальности`,
+        value: null
       })
     },
     levels () {
@@ -270,6 +248,42 @@ export default {
         this.clearFields()
       }
     },
+    // uploadStudents () {
+    //   this.dataFromJson.forEach((student) => {
+    //     const studentStartDate = student.startdate.split('/')
+    //     const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
+    //     const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
+    //     const year = '20' + studentStartDate[2]
+    //     const realDay = `${year}-${month}-${day}`
+
+    //     const realspecialty = this.$store.getters.specialties.find(speciality => {
+    //       const splittedSpecialty = student.speciality.split(' ')
+    //       return speciality.code === splittedSpecialty[0]
+    //     })
+    //     const realspecialtyID = realspecialty ? realspecialty.id : null
+
+    //     const realFacultyID = this.$store.getters.faculties.find(faculty => {
+    //       return faculty.name === student.department
+    //     })
+
+    //     const studentInfo = {
+    //       fio: student.fio,
+    //       facultyID: realFacultyID.id,
+    //       groupID: null,
+    //       specialtyID: realspecialtyID,
+    //       groupCourse: '',
+    //       groupNumber: '',
+    //       groupTeh: null,
+    //       level: student.level,
+    //       studyForm: student.studyForm,
+    //       financing: student.financing,
+    //       startDate: realDay
+    //     }
+    //     // return studentInfo
+    //     this.$store.dispatch('createStudent', studentInfo)
+    //   })
+    //   // console.log(uploadedUsers)
+    // },
     clearFields () {
       this.fio = ''
       this.facultyID = null
@@ -287,5 +301,4 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped
-</style>
+

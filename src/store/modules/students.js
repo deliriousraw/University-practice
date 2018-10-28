@@ -10,6 +10,22 @@ export default {
     },
     loadStudents (state, payload) {
       state.students = payload
+    },
+    updateStudent (state, payload) {
+      const editedStudent = state.students.find(student => {
+        return student.id === payload.id
+      })
+      editedStudent.fio = payload.fio
+      editedStudent.facultyID = payload.facultyID
+      editedStudent.groupID = payload.groupID
+      editedStudent.specialtyID = payload.specialtyID
+      editedStudent.groupCourse = payload.groupCourse
+      editedStudent.groupNumber = payload.groupNumber
+      editedStudent.groupTeh = payload.groupTeh
+      editedStudent.level = payload.level
+      editedStudent.studyForm = payload.studyForm
+      editedStudent.financing = payload.financing
+      editedStudent.startDate = payload.startDate
     }
   },
   actions: {
@@ -51,6 +67,31 @@ export default {
           })
         })
         commit('loadStudents', students)
+        commit('setLoading', false)
+      } catch (error) {
+        commit('setLoading', false)
+        commit('setError', error.message)
+        throw error
+      }
+    },
+    async updateStudent ({commit}, payload) {
+      commit('clearError')
+      commit('setLoading', true)
+      try {
+        await fb.firestore().collection('students').doc(payload.id).set({
+          fio: payload.fio,
+          facultyID: payload.facultyID,
+          groupID: payload.groupID,
+          specialtyID: payload.specialtyID,
+          groupCourse: payload.groupCourse,
+          groupNumber: payload.groupNumber,
+          groupTeh: payload.groupTeh,
+          level: payload.level,
+          studyForm: payload.studyForm,
+          financing: payload.financing,
+          startDate: payload.startDate
+        })
+        commit('updateStudent', payload)
         commit('setLoading', false)
       } catch (error) {
         commit('setLoading', false)
