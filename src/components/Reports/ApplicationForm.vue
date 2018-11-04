@@ -126,6 +126,51 @@
               v-model="textafter"
             ></v-textarea>
           </v-flex>
+          <v-flex xs12>
+            <v-data-table v-model="selected"
+                          :headers="headers"
+                          :items="students"
+                          :pagination.sync="pagination"
+                          select-all
+                          item-key="fio"
+                          class="elevation-1">
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th>
+                    <v-checkbox :input-value="props.all"
+                                :indeterminate="props.indeterminate"
+                                primary
+                                hide-details
+                                @click.native="toggleAll">
+                    </v-checkbox>
+                  </th>
+                  <th v-for="header in props.headers"
+                      :key="header.text"
+                      :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+                      @click="changeSort(header.value)">
+                    <v-icon small>arrow_upward</v-icon>
+                    {{ header.text }}
+                  </th>
+                </tr>
+              </template>
+              <template slot="items" slot-scope="props">
+                <tr :active="props.selected" @click="props.selected = !props.selected">
+                  <td>
+                    <v-checkbox :input-value="props.selected"
+                                primary
+                                hide-details>
+                    </v-checkbox>
+                  </td>
+                  <td class="text-xs-left">{{ props.item.fio }}</td>
+                  <td class="text-xs-right">{{ getGroupName(props.item.groupID) }}</td>
+                  <td class="text-xs-right">{{ props.item.groupCourse }}</td>
+                  <td class="text-xs-right">{{ props.item.groupNumber }}</td>
+                  <td class="text-xs-right">{{ props.item.practicePlace }}</td>
+                  <td class="text-xs-right">{{ props.item.practiceLeader }}</td>
+                </tr>
+              </template>
+            </v-data-table>
+          </v-flex>
           <v-btn :disabled="!facultyID"
                   class="success mb-3"
                   @click="createApplication()">
@@ -154,11 +199,61 @@ export default {
       startDateMenu: false,
       finishDateMenu: false,
       textbefore: '',
-      textafter: ''
+      textafter: '',
+      pagination: {
+        sortBy: 'name'
+      },
+      selected: [],
+      headers: [
+        {
+          text: 'Ф.И.О',
+          align: 'left',
+          sortable: false,
+          value: 'fio'
+        },
+        { text: 'Группа', value: 'groupID' },
+        { text: 'Курс', value: 'groupCourse' },
+        { text: 'Номер группы', value: 'groupNumber' },
+        {
+          text: 'Предприятие',
+          value: 'place',
+          sortable: true
+        },
+        {
+          text: 'Руководитель',
+          value: 'leader',
+          sortable: true
+        }
+      ]
     }
   },
   computed: {
+    students () {
+      return this.$store.getters.students.map(student => {
+        return {
+          id: student.id,
+          fio: student.fio,
+          facultyID: student.facultyID,
+          groupID: student.groupID,
+          specialtyID: student.specialtyID,
+          groupCourse: student.groupCourse,
+          groupNumber: student.groupNumber,
+          groupTeh: student.groupTeh,
+          level: student.level,
+          studyForm: student.studyForm,
+          financing: student.financing,
+          startDate: student.startDate,
+          practicePlace: student.practicePlace,
+          practiceLeader: student.practiceLeader
+        }
+      })
+    },
+    selectedStudents () {
+      let sorted = []
+      // if () {
 
+      // }
+    },
     textbeforeAPP () {
       return `Згідно з навчальним  планом підготовки фахівців ОР «Бакалавр» напряму ${this.specialty.code} «${this.specialty.name}» ${this.faculty.name} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
     },
@@ -196,6 +291,9 @@ export default {
         }
       })
     },
+    groupsLibrary () {
+      return this.$store.getters.groups
+    },
     groups () {
       const filteredGroups = this.$store.getters.groups.filter((group) => {
         return group.facultyId === this.facultyID
@@ -220,6 +318,28 @@ export default {
     }
   },
   methods: {
+    getGroupName (groupID) {
+      if (groupID !== null) {
+        const group = this.groupsLibrary.find(group => {
+          return group.id === groupID
+        })
+        return group.alias
+      } else {
+        return 'Без группы'
+      }
+    },
+    toggleAll () {
+      if (this.selected.length) this.selected = []
+      else this.selected = this.students.slice()
+    },
+    changeSort (column) {
+      if (this.pagination.sortBy === column) {
+        this.pagination.descending = !this.pagination.descending
+      } else {
+        this.pagination.sortBy = column
+        this.pagination.descending = false
+      }
+    },
     createApplication () {
       // const faculty = this.$store.getters.getFacultiesById(this.facultyID)
       // const department = this.$store.getters.getDepartmentById(this.departmentID)

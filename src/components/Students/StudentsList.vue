@@ -36,8 +36,10 @@
             <template slot="items" slot-scope="props">
               <td>{{ props.item.fio }}</td>
               <td>{{ getGroupName(props.item.groupID)}}</td>
-              <td>{{ props.item.groupCourse.length === 0 ? '—' : props.item.groupCourse }}</td>
-              <td>{{ props.item.groupNumber.length === 0 ? '—' : props.item.groupNumber}}</td>
+              <td>{{ props.item.groupCourse === null || props.item.groupCourse.length === 0 ? '—' : props.item.groupCourse }}</td>
+              <td>{{ props.item.groupNumber === null || props.item.groupNumber.length === 0 ? '—' : props.item.groupNumber}}</td>
+              <td>{{ props.item.practicePlace === null || props.item.practicePlace.length === 0 ? '—' : props.item.practicePlace}}</td>
+              <td>{{ props.item.practiceLeader === null || props.item.practiceLeader.length === 0 ? '—' : props.item.practiceLeader}}</td>
               <td class="text-xs-right">
                 <EditStudent :student="props.item" class="mb-3"></EditStudent>
               </td>
@@ -73,8 +75,20 @@ export default {
         { text: 'Группа', value: 'groupID' },
         { text: 'Курс', value: 'groupCourse' },
         { text: 'Номер группы', value: 'groupNumber' },
+        {
+          text: 'Предприятие',
+          value: 'place',
+          sortable: true
+        },
+        {
+          text: 'Руководитель',
+          value: 'leader',
+          sortable: true
+        },
         { text: 'Действия', value: 'actions', sortable: false, align: 'right' }
-      ]
+      ],
+      practicePlaces: ['КІСТ НТУ'],
+      practiceLeaders: []
     }
   },
   computed: {
@@ -92,7 +106,9 @@ export default {
           level: student.level,
           studyForm: student.studyForm,
           financing: student.financing,
-          startDate: student.startDate
+          startDate: student.startDate,
+          practicePlace: student.practicePlace,
+          practiceLeader: student.practiceLeader
         }
       })
     },
@@ -100,15 +116,12 @@ export default {
       let sortedStudents = this.students
       if (this.facultyID !== null) {
         sortedStudents = sortedStudents.filter(student => {
-          console.log(student.facultyID, this.facultyID)
           return student.facultyID === this.facultyID
         })
-        console.log('sorted1')
       } else if (this.specialtyID !== null) {
         sortedStudents = sortedStudents.filter(student => {
           return student.specialtyID === this.specialtyID
         })
-        console.log('sorted2')
       }
       return sortedStudents
     },

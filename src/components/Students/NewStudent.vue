@@ -81,6 +81,21 @@
             </v-flex>
           </v-layout>
 
+          <v-layout row>
+            <v-flex xs6 class="mr-5">
+              <v-combobox v-model="practicePlace"
+                          :items="practicePlaces"
+                          label="Место прохождения практики">
+              </v-combobox>
+            </v-flex>
+            <v-flex xs6>
+              <v-combobox v-model="practiceLeader"
+                          :items="practiceLeaders"
+                          label="Руководитель практики">
+              </v-combobox>
+            </v-flex>
+          </v-layout>
+
           <v-menu ref="menu2"
                       :close-on-content-click="false"
                       v-model="startDateMenu"
@@ -111,16 +126,16 @@
               Добавить студента
         </v-btn>
         <!-- ФУНКЦИЯ ДЛЯ ИМПОРТА В БАЗУ FIREBASE // -->
-        <!-- <v-btn  class="success mb-3"
+        <v-btn  class="success mb-3"
                 @click="uploadStudents">
               Добавить в firebase
-        </v-btn> -->
+        </v-btn>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 <script>
-// import studData from './4 course.json'
+import studData from './4 course.json'
 export default {
   data () {
     return {
@@ -136,30 +151,16 @@ export default {
       financing: 'Бюджет',
       startDate: '',
       startDateMenu: false,
+      practicePlaces: ['КІСТ НТУ'],
+      practicePlace: '',
+      practiceLeader: '',
+      practiceLeaders: [],
       valid: false
     }
   },
   computed: {
-    // dataFromJson () {
-    //   return studData.students
-    // },
-    students () {
-      return this.$store.getters.students.map(student => {
-        return {
-          id: student.id,
-          fio: student.fio,
-          facultyID: student.facultyID,
-          groupID: student.groupID,
-          specialtyID: student.specialtyID,
-          groupCourse: student.groupCourse,
-          groupNumber: student.groupNumber,
-          groupTeh: student.groupTeh,
-          level: student.level,
-          studyForm: student.studyForm,
-          financing: student.financing,
-          startDate: student.startDate
-        }
-      })
+    dataFromJson () {
+      return studData.students
     },
     faculties () {
       return this.$store.getters.faculties.map(faculty => {
@@ -186,9 +187,6 @@ export default {
           text: `${specialty.code} ${specialty.name}`,
           value: specialty.id
         }
-      }).push({
-        text: `Без специальности`,
-        value: null
       })
     },
     levels () {
@@ -242,48 +240,52 @@ export default {
           level: this.level,
           studyForm: this.studyForm,
           financing: this.financing,
-          startDate: this.startDate
+          startDate: this.startDate,
+          practicePlace: this.practicePlace,
+          practiceLeader: this.practiceLeader
         }
         this.$store.dispatch('createStudent', student)
         this.clearFields()
       }
     },
-    // uploadStudents () {
-    //   this.dataFromJson.forEach((student) => {
-    //     const studentStartDate = student.startdate.split('/')
-    //     const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
-    //     const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
-    //     const year = '20' + studentStartDate[2]
-    //     const realDay = `${year}-${month}-${day}`
+    uploadStudents () {
+      this.dataFromJson.forEach((student) => {
+        const studentStartDate = student.startdate.split('/')
+        const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
+        const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
+        const year = '20' + studentStartDate[2]
+        const realDay = `${year}-${month}-${day}`
 
-    //     const realspecialty = this.$store.getters.specialties.find(speciality => {
-    //       const splittedSpecialty = student.speciality.split(' ')
-    //       return speciality.code === splittedSpecialty[0]
-    //     })
-    //     const realspecialtyID = realspecialty ? realspecialty.id : null
+        const realspecialty = this.$store.getters.specialties.find(speciality => {
+          const splittedSpecialty = student.speciality.split(' ')
+          return speciality.code === splittedSpecialty[0]
+        })
+        const realspecialtyID = realspecialty ? realspecialty.id : null
 
-    //     const realFacultyID = this.$store.getters.faculties.find(faculty => {
-    //       return faculty.name === student.department
-    //     })
+        const realFacultyID = this.$store.getters.faculties.find(faculty => {
+          return faculty.name === student.department
+        })
 
-    //     const studentInfo = {
-    //       fio: student.fio,
-    //       facultyID: realFacultyID.id,
-    //       groupID: null,
-    //       specialtyID: realspecialtyID,
-    //       groupCourse: '',
-    //       groupNumber: '',
-    //       groupTeh: null,
-    //       level: student.level,
-    //       studyForm: student.studyForm,
-    //       financing: student.financing,
-    //       startDate: realDay
-    //     }
-    //     // return studentInfo
-    //     this.$store.dispatch('createStudent', studentInfo)
-    //   })
-    //   // console.log(uploadedUsers)
-    // },
+        const studentInfo = {
+          fio: student.fio,
+          facultyID: realFacultyID.id,
+          groupID: null,
+          specialtyID: realspecialtyID,
+          groupCourse: '',
+          groupNumber: '',
+          practicePlace: '',
+          practiceLeader: '',
+          groupTeh: null,
+          level: student.level,
+          studyForm: student.studyForm,
+          financing: student.financing,
+          startDate: realDay
+        }
+        // return studentInfo
+        this.$store.dispatch('createStudent', studentInfo)
+      })
+      // console.log(uploadedUsers)
+    },
     clearFields () {
       this.fio = ''
       this.facultyID = null
@@ -297,6 +299,8 @@ export default {
       this.financing = 'Бюджет'
       this.startDate = ''
       this.startDateMenu = false
+      this.practiceLeader = ''
+      this.practicePlace = ''
     }
   }
 }

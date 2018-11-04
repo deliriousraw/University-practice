@@ -26,6 +26,8 @@ export default {
       editedStudent.studyForm = payload.studyForm
       editedStudent.financing = payload.financing
       editedStudent.startDate = payload.startDate
+      editedStudent.practicePlace = payload.practicePlace
+      editedStudent.practiceLeader = payload.practiceLeader
     }
   },
   actions: {
@@ -62,7 +64,9 @@ export default {
               level: doc.data().level,
               studyForm: doc.data().studyForm,
               financing: doc.data().financing,
-              startDate: doc.data().startDate
+              startDate: doc.data().startDate,
+              practicePlace: doc.data().practicePlace,
+              practiceLeader: doc.data().practiceLeader
             })
           })
         })
@@ -89,7 +93,9 @@ export default {
           level: payload.level,
           studyForm: payload.studyForm,
           financing: payload.financing,
-          startDate: payload.startDate
+          startDate: payload.startDate,
+          practicePlace: payload.practicePlace,
+          practiceLeader: payload.practiceLeader
         })
         commit('updateStudent', payload)
         commit('setLoading', false)

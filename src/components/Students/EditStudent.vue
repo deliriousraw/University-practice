@@ -90,6 +90,21 @@
                 </v-flex>
               </v-layout>
 
+              <v-layout row>
+              <v-flex xs6 class="mr-5">
+                <v-combobox v-model="practicePlace"
+                            :items="practicePlaces"
+                            label="Место прохождения практики">
+                </v-combobox>
+              </v-flex>
+              <v-flex xs6>
+                <v-combobox v-model="practiceLeader"
+                            :items="practiceLeaders"
+                            label="Руководитель практики">
+                </v-combobox>
+              </v-flex>
+            </v-layout>
+
               <v-menu ref="menu2"
                           :close-on-content-click="false"
                           v-model="startDateMenu"
@@ -158,7 +173,11 @@ export default {
       studyForm: this.student.studyForm,
       financing: this.student.financing,
       startDate: this.student.startDate,
-      startDateMenu: false
+      practicePlace: this.student.practicePlace,
+      practiceLeader: this.student.practiceLeader,
+      startDateMenu: false,
+      practicePlaces: ['КІСТ НТУ'],
+      practiceLeaders: []
     }
   },
   computed: {
@@ -240,6 +259,8 @@ export default {
       this.studyForm = this.student.studyForm
       this.financing = this.student.financing
       this.startDate = this.student.startDate
+      this.practicePlace = this.student.practicePlace
+      this.practiceLeader = this.student.practiceLeader
     },
     onSave () {
       const student = {
@@ -254,7 +275,9 @@ export default {
         level: this.level,
         studyForm: this.studyForm,
         financing: this.financing,
-        startDate: this.startDate
+        startDate: this.startDate,
+        practicePlace: this.practicePlace,
+        practiceLeader: this.practiceLeader
       }
       this.$store.dispatch('updateStudent', student)
       this.dialog = false
