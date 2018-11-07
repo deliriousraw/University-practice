@@ -14,10 +14,13 @@
     "docx": "^4.3.0",
     "file-saver": "^2.0.0-rc.4",
     "firebase": "^5.5.5",
+    "moment": "^2.22.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vuetify": "^1.0.0",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "xlsx": "^0.14.0",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

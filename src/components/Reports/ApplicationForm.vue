@@ -129,7 +129,7 @@
           <v-flex xs12>
             <v-data-table v-model="selected"
                           :headers="headers"
-                          :items="students"
+                          :items="selectedStudents"
                           :pagination.sync="pagination"
                           select-all
                           item-key="fio"
@@ -249,10 +249,33 @@ export default {
       })
     },
     selectedStudents () {
-      let sorted = []
-      // if () {
-
+      let sorted = this.students
+      if (this.facultyID) {
+        sorted = sorted.filter(student => {
+          return student.facultyID === this.facultyID
+        })
+      }
+      // if (this.departmentID) {
+      //   sorted = sorted.filter(student => {
+      //     return student.specialtyID === this.departmentID
+      //   })
       // }
+      if (this.groupID) {
+        sorted = sorted.filter(student => {
+          return student.groupID === this.groupID
+        })
+        if (this.groupCourse.length !== 0) {
+          sorted = sorted.filter(student => {
+            return student.groupCourse === this.groupCourse
+          })
+          if (this.groupNumber.length !== 0) {
+            sorted = sorted.filter(student => {
+              return student.groupNumber === this.groupNumber
+            })
+          }
+        }
+      }
+      return sorted
     },
     textbeforeAPP () {
       return `Згідно з навчальним  планом підготовки фахівців ОР «Бакалавр» напряму ${this.specialty.code} «${this.specialty.name}» ${this.faculty.name} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
@@ -494,6 +517,12 @@ export default {
     },
     textafterAPP () {
       this.textafter = this.textafterAPP
+    },
+    facultyID () {
+      this.departmentID = null
+      this.groupID = null
+      this.groupCourse = ''
+      this.groupNumber = ''
     }
   }
 }
