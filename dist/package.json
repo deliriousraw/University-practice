@@ -1,0 +1,13 @@
+{
+  "name": "university-practice",
+  "version": "1.0.0",
+  "description": "App for creating applications and reports for university",
+  "author": "Artem Bodnia",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install express"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

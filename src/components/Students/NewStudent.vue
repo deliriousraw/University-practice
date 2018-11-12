@@ -126,16 +126,16 @@
               Добавить студента
         </v-btn>
         <!-- ФУНКЦИЯ ДЛЯ ИМПОРТА В БАЗУ FIREBASE // -->
-        <v-btn  class="success mb-3"
+        <!-- <v-btn  class="success mb-3"
                 @click="uploadStudents">
               Добавить в firebase
-        </v-btn>
+        </v-btn> -->
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 <script>
-import studData from './4 course.json'
+// import studData from './4 course.json'
 export default {
   data () {
     return {
@@ -159,9 +159,9 @@ export default {
     }
   },
   computed: {
-    dataFromJson () {
-      return studData.students
-    },
+    // dataFromJson () {
+    //   return studData.students
+    // },
     faculties () {
       return this.$store.getters.faculties.map(faculty => {
         return {
@@ -248,44 +248,44 @@ export default {
         this.clearFields()
       }
     },
-    uploadStudents () {
-      this.dataFromJson.forEach((student) => {
-        const studentStartDate = student.startdate.split('/')
-        const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
-        const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
-        const year = '20' + studentStartDate[2]
-        const realDay = `${year}-${month}-${day}`
+    // uploadStudents () {
+    //   this.dataFromJson.forEach((student) => {
+    //     const studentStartDate = student.startdate.split('/')
+    //     const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
+    //     const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
+    //     const year = '20' + studentStartDate[2]
+    //     const realDay = `${year}-${month}-${day}`
 
-        const realspecialty = this.$store.getters.specialties.find(speciality => {
-          const splittedSpecialty = student.speciality.split(' ')
-          return speciality.code === splittedSpecialty[0]
-        })
-        const realspecialtyID = realspecialty ? realspecialty.id : null
+    //     const realspecialty = this.$store.getters.specialties.find(speciality => {
+    //       const splittedSpecialty = student.speciality.split(' ')
+    //       return speciality.code === splittedSpecialty[0]
+    //     })
+    //     const realspecialtyID = realspecialty ? realspecialty.id : null
 
-        const realFacultyID = this.$store.getters.faculties.find(faculty => {
-          return faculty.name === student.department
-        })
+    //     const realFacultyID = this.$store.getters.faculties.find(faculty => {
+    //       return faculty.name === student.department
+    //     })
 
-        const studentInfo = {
-          fio: student.fio,
-          facultyID: realFacultyID.id,
-          groupID: null,
-          specialtyID: realspecialtyID,
-          groupCourse: '',
-          groupNumber: '',
-          practicePlace: '',
-          practiceLeader: '',
-          groupTeh: null,
-          level: student.level,
-          studyForm: student.studyForm,
-          financing: student.financing,
-          startDate: realDay
-        }
-        // return studentInfo
-        this.$store.dispatch('createStudent', studentInfo)
-      })
-      // console.log(uploadedUsers)
-    },
+    //     const studentInfo = {
+    //       fio: student.fio,
+    //       facultyID: realFacultyID.id,
+    //       groupID: null,
+    //       specialtyID: realspecialtyID,
+    //       groupCourse: '',
+    //       groupNumber: '',
+    //       practicePlace: '',
+    //       practiceLeader: '',
+    //       groupTeh: null,
+    //       level: student.level,
+    //       studyForm: student.studyForm,
+    //       financing: student.financing,
+    //       startDate: realDay
+    //     }
+    //     // return studentInfo
+    //     this.$store.dispatch('createStudent', studentInfo)
+    //   })
+    //   // console.log(uploadedUsers)
+    // },
     clearFields () {
       this.fio = ''
       this.facultyID = null
