@@ -134,7 +134,7 @@
                           select-all
                           item-key="fio"
                           class="elevation-1">
-              <template slot="headers" slot-scope="props">
+              <template slot="items" slot-scope="props">
                 <tr>
                   <th>
                     <v-checkbox :input-value="props.all"
@@ -266,11 +266,11 @@ export default {
         })
         if (this.groupCourse.length !== 0) {
           sorted = sorted.filter(student => {
-            return student.groupCourse === this.groupCourse
+            return student.groupCourse === Number(this.groupCourse)
           })
           if (this.groupNumber.length !== 0) {
             sorted = sorted.filter(student => {
-              return student.groupNumber === this.groupNumber
+              return student.groupNumber === Number(this.groupNumber)
             })
           }
         }
@@ -278,10 +278,10 @@ export default {
       return sorted
     },
     textbeforeAPP () {
-      return `Згідно з навчальним  планом підготовки фахівців ОР «Бакалавр» напряму ${this.specialty.code} «${this.specialty.name}» ${this.faculty.name} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
+      return `Згідно з навчальним  планом підготовки фахівців ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів третього курсу на переддипломну практику студентів, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.courseTextForApplication} курсу на переддипломну практику студентів, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
@@ -336,8 +336,41 @@ export default {
         }
       })
     },
-    magister () {
-      return this.groupCourse > 4
+    isMasters () {
+      return Number(this.groupCourse) > 4
+    },
+    courseForApplication () {
+      return this.isMasters ? Number(this.groupCourse) - 4 : this.groupCourse
+    },
+    courseTextForApplication () {
+      switch (Number(this.groupCourse)) {
+        case 1 :
+          return 'першого'
+        case 2 :
+          return 'другого'
+        case 3 :
+          return 'третього'
+        case 4 :
+          return 'четвертого'
+        case 5 :
+          return 'першого'
+        case 6 :
+          return 'другого'
+        default :
+          return ''
+      }
+    },
+    facultyTextForApplication () {
+      const faculty = this.$store.getters.getFacultiesById(this.facultyID)
+      if (!faculty) {
+        return ''
+      } else if (faculty.name === 'Автомеханічний факультет') {
+        return 'автомеханічного факультету'
+      } else {
+        let facultyText = faculty.name.split(' ')
+        facultyText[0] = facultyText[0].toLowerCase() + 'у'
+        return facultyText.join(' ')
+      }
     }
   },
   methods: {
@@ -367,7 +400,7 @@ export default {
       // const faculty = this.$store.getters.getFacultiesById(this.facultyID)
       // const department = this.$store.getters.getDepartmentById(this.departmentID)
       const group = this.$store.getters.getGroupById(this.groupID)
-
+      console.log('ok')
       const doc = new docx.Document({
         creator: 'НТУ',
         title: 'Наказ',
@@ -411,7 +444,7 @@ export default {
 
       const topFaculty = new docx.Paragraph('').style('myStyles')
       const topFacultytext1 = new docx.TextRun('Про направлення студентів').break()
-      const topFacultytext2 = new docx.TextRun(`${this.faculty.name}`).break()
+      const topFacultytext2 = new docx.TextRun(`${this.facultyTextForApplication}`).break()
       const topFacultytext3 = new docx.TextRun('на практику').break()
 
       topFaculty.addRun(topFacultytext1)
@@ -434,7 +467,7 @@ export default {
       groupText.addRun(groupText1)
       doc.addParagraph(groupText)
 
-      doc.createParagraph(`${this.group.alias}-${this.groupCourse}-${this.groupNumber}${this.groupTeh ? 'тех.' : ''}`).style('myHeading').center()
+      doc.createParagraph(`${this.group.alias}-${this.courseForApplication}-${this.groupNumber}${this.isMasters ? 'м' : ''}${this.groupTeh ? 'тех.' : ''}`).style('myHeading').center()
 
       doc.createParagraph('Керівник практики').style('myHeading').left()
 
