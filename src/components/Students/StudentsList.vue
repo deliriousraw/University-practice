@@ -15,6 +15,35 @@
       </v-flex>
     </v-layout>
     <v-layout row>
+      <v-flex xs4 class="mr-5">
+        <v-select v-if="facultyID !== null"
+                  :items="groupsLibrary"
+                  v-model="groupID"
+                  label="Группа">
+        </v-select>
+      </v-flex>
+      <v-flex xs4 class="mr-5">
+        <v-text-field v-if="groupID !== null"
+                      name="groupCourse"
+                      label="Курс группы"
+                      type="number"
+                      min="1"
+                      max="6"
+                      v-model="groupCourse">
+        </v-text-field>
+      </v-flex>
+      <v-flex xs4 class="mr-5">
+        <v-text-field v-if="groupID !== null"
+                      name="groupNumber"
+                      label="Номер группы"
+                      type="number"
+                      min="1"
+                      max="10"
+                      v-model="groupNumber">
+        </v-text-field>
+      </v-flex>
+    </v-layout>
+    <v-layout row>
       <v-flex xs12>
         <v-card>
           <v-card-title>
@@ -70,7 +99,10 @@ export default {
   data () {
     return {
       facultyID: null,
+      groupID: null,
       specialtyID: null,
+      groupCourse: '',
+      groupNumber: '',
       search: '',
       headers: [
         {
@@ -120,17 +152,33 @@ export default {
       })
     },
     sortedStudents () {
-      let sortedStudents = this.students
-      if (this.facultyID !== null) {
-        sortedStudents = sortedStudents.filter(student => {
+      let sorted = this.students
+      if (this.facultyID) {
+        sorted = sorted.filter(student => {
           return student.facultyID === this.facultyID
         })
-      } else if (this.specialtyID !== null) {
-        sortedStudents = sortedStudents.filter(student => {
-          return student.specialtyID === this.specialtyID
-        })
       }
-      return sortedStudents
+      // if (this.departmentID) {
+      //   sorted = sorted.filter(student => {
+      //     return student.specialtyID === this.departmentID
+      //   })
+      // }
+      if (this.groupID) {
+        sorted = sorted.filter(student => {
+          return student.groupID === this.groupID
+        })
+        if (this.groupCourse.length !== 0) {
+          sorted = sorted.filter(student => {
+            return student.groupCourse === Number(this.groupCourse)
+          })
+          if (this.groupNumber.length !== 0) {
+            sorted = sorted.filter(student => {
+              return student.groupNumber === Number(this.groupNumber)
+            })
+          }
+        }
+      }
+      return sorted
     },
     faculties () {
       let faculties = this.$store.getters.faculties.map(faculty => {
@@ -147,6 +195,17 @@ export default {
     },
     groups () {
       return this.$store.getters.groups
+    },
+    groupsLibrary () {
+      const filteredGroups = this.$store.getters.groups.filter((group) => {
+        return group.facultyId === this.facultyID
+      })
+      return filteredGroups.map(department => {
+        return {
+          text: department.alias,
+          value: department.id
+        }
+      })
     },
     sortedGroups () {
       return this.groups.filter(group => {

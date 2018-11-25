@@ -35,8 +35,7 @@ export default new Router({
     {
       path: '/register',
       name: 'register',
-      component: Register,
-      beforeEnter: AuthGuard
+      component: Register
     },
     {
       path: '/create/application',

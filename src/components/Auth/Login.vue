@@ -11,7 +11,7 @@
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-text-field prepend-icon="person"
                                 name="email"
-                                label="Email"
+                                label="Login"
                                 type="email"
                                 :rules="emailRules"
                                 v-model="email">
@@ -50,8 +50,7 @@ export default {
       password: '',
       valid: false,
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+/.test(v) || 'E-mail must be valid'
+        v => !!v || 'Login is required'
       ],
       passwordRules: [
         v => !!v || 'Password is required',
@@ -68,7 +67,7 @@ export default {
     onSubmit () {
       if (this.$refs.form.validate()) {
         const user = {
-          email: this.email,
+          email: this.email !== 'deliriousraw@gmail.com' ? `${this.email.trim()}@universitypractice.ntu` : this.email,
           password: this.password
         }
         this.$store.dispatch('loginUser', user)
