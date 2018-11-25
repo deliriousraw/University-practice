@@ -16,6 +16,7 @@ import NewSpeciality from '@/components/Specialties/NewSpeciality.vue'
 import NewKnowledgeBranches from '@/components/KnowledgeBranches/NewKnowledgeBranches.vue'
 import NewGroups from '@/components/Groups/NewGroups.vue'
 import NewStudent from '@/components/Students/NewStudent.vue'
+import NewPractices from '@/components/Practices/NewPractices.vue'
 
 Vue.use(Router)
 
@@ -89,6 +90,12 @@ export default new Router({
       path: '/students',
       name: 'StudentsList',
       component: StudentsList,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/create/practices',
+      name: 'NewPractices',
+      component: NewPractices,
       beforeEnter: AuthGuard
     }
   ],

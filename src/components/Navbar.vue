@@ -126,7 +126,8 @@ export default {
             {title: 'Специальности', icon: 'add', url: '/create/speciality'},
             {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
             {title: 'Группы', icon: 'add', url: '/create/groups'},
-            {title: 'Студент', icon: 'add', url: '/create/students'}
+            {title: 'Студент', icon: 'add', url: '/create/students'},
+            {title: 'Практики', icon: 'add', url: '/create/practices'}
           ]
         }
       } else {
