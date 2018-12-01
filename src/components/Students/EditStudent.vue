@@ -100,6 +100,7 @@
               <v-flex xs6>
                 <v-combobox v-model="practiceLeader"
                             :items="practiceLeaders"
+                            @change="createIfNewPracticeLeader($event)"
                             label="Руководитель практики">
                 </v-combobox>
               </v-flex>
@@ -176,8 +177,7 @@ export default {
       practicePlace: this.student.practicePlace,
       practiceLeader: this.student.practiceLeader,
       startDateMenu: false,
-      practicePlaces: ['КІСТ НТУ'],
-      practiceLeaders: []
+      practicePlaces: ['КІСТ НТУ']
     }
   },
   computed: {
@@ -243,9 +243,22 @@ export default {
           value: 'Контракт'
         }
       ]
+    },
+    practiceLeaders () {
+      return this.$store.getters.practiceLeaders.map(practiceLeader => practiceLeader.name)
     }
   },
   methods: {
+    createIfNewPracticeLeader (event) {
+      if (event) {
+        const isPracticeLeaderExist = this.practiceLeaders.some(practiceLeader => {
+          return practiceLeader === event.trim()
+        })
+        if (!isPracticeLeaderExist) {
+          this.$store.dispatch('createPracticeLeader', {name: event.trim()})
+        }
+      }
+    },
     onCancel () {
       this.dialog = false
       this.fio = this.student.fio

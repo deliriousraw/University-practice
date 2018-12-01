@@ -14,7 +14,7 @@
               </v-list-tile-content>
 
             </v-list-tile>
-            <v-list-group  prepend-icon="account_circle"
+            <v-list-group v-if="isAdmin" prepend-icon="account_circle"
                            value="true">
 
               <v-list-tile slot="activator">
@@ -58,7 +58,7 @@
                      <v-icon left>{{link.icon}}</v-icon>
                      {{link.title}}
               </v-btn>
-              <v-menu bottom left>
+              <v-menu v-if="isAdmin" bottom left>
                 <v-btn slot="activator"
                        dark
                        icon>
@@ -111,6 +111,9 @@ export default {
   computed: {
     isUserLoggedIn () {
       return this.$store.getters.isUserLoggedIn
+    },
+    isAdmin () {
+      return this.$store.getters.user !== null && (this.$store.getters.user.id === '9gfq9NYoOSUBphiOhkCphlobKsn2' || this.$store.getters.user.id === 'v4RYrLYXXoMJq2Y3NmCq0dU724Q2')
     },
     links () {
       if (this.isUserLoggedIn) {

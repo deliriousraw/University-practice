@@ -183,7 +183,6 @@
 <script>
 import * as docx from 'docx'
 import saveAs from 'file-saver'
-import { BorderStyle } from 'docx'
 
 export default {
   data () {
@@ -231,7 +230,7 @@ export default {
   computed: {
     isInvalid () {
       return this.facultyID === null || this.departmentID === null || this.groupID === null ||
-            this.specialtyID === null || !this.groupCourse || !this.groupNumber ||
+            this.specialtyID === null || !this.groupCourse ||
             !this.startDate || !this.finishDate
     },
     students () {
@@ -254,6 +253,24 @@ export default {
         }
       })
     },
+    selectedGroups () {
+      if (this.groupCourse) {
+        if (this.groupNumber) {
+          return [`${this.$store.getters.getGroupById(this.groupID).alias}-${this.groupCourse}-${this.groupNumber}`]
+        } else {
+          const groups = Array.from(new Set(this.selected.map(student => Number(student.groupNumber))))
+          const groupAlias = this.$store.getters.getGroupById(this.groupID).alias
+          return groups.map(group => {
+            return `${groupAlias}-${this.isMasters ? this.groupCourse - 4 : this.groupCourse}-${group}${this.isMasters ? 'м' : ''}${this.groupTeh ? 'тех.' : ''}`
+          }).sort((a, b) => {
+            const first = a
+            const second = b
+            return (first < second) ? -1 : (first > second) ? 1 : 0
+          })
+        }
+      }
+    },
+
     selectedStudents () {
       let sorted = this.students
       if (this.facultyID) {
@@ -287,7 +304,7 @@ export default {
       return `Згідно з навчальним  планом підготовки фахівців ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів ${this.courseTextForApplication} курсу на переддипломну практику студентів, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.courseTextForApplication} курсу на переддипломну практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
@@ -403,13 +420,10 @@ export default {
       }
     },
     createApplication () {
-      // const faculty = this.$store.getters.getFacultiesById(this.facultyID)
-      // const department = this.$store.getters.getDepartmentById(this.departmentID)
-      const group = this.$store.getters.getGroupById(this.groupID)
       const doc = new docx.Document({
         creator: 'НТУ',
         title: 'Наказ',
-        description: `Наказ про проходження практики студентами групи ${group.alias}-${this.groupCourse}-${this.groupNumber}`
+        description: `Наказ про проходження практики студентами групи ${this.selectedGroups.join(', ')}`
       })
 
       doc.Styles.createParagraphStyle('myStyles', 'My Styles')
@@ -465,7 +479,7 @@ export default {
       groupText.addRun(groupText1)
       doc.addParagraph(groupText)
 
-      doc.createParagraph(`${this.group.alias}-${this.courseForApplication}-${this.groupNumber}${this.isMasters ? 'м' : ''}${this.groupTeh ? 'тех.' : ''}`).style('myHeading').center()
+      doc.createParagraph(`${this.selectedGroups.join(', ')}`).style('myHeading').center()
 
       // this.selected.forEach((student, index) => {
       //   const practiceItem = new docx.Paragraph('').style('myHeading').left()
@@ -475,36 +489,40 @@ export default {
       // })
 
       const table = doc.createTable(this.selected.length, 4).setWidth(docx.WidthType.PERCENTAGE, '105%')
-
+      this.selected.sort((a, b) => {
+        const first = a.fio.toLowerCase().trim()
+        const second = b.fio.toLowerCase().trim()
+        return (first < second) ? -1 : (first > second) ? 1 : 0
+      })
       this.selected.forEach((student, index) => {
         table
           .getCell(index, 0)
           .addContent(new docx.Paragraph(`${index + 1}.`).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
         table
           .getCell(index, 1)
-          .addContent(new docx.Paragraph(student.fio).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+          .addContent(new docx.Paragraph(this.formatName(student.fio)).style('myStyles'))
+          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
         table
           .getCell(index, 2)
           .addContent(new docx.Paragraph(student.practicePlace).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
         table
           .getCell(index, 3)
           .addContent(new docx.Paragraph(student.practiceLeader).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
       })
 
       doc.createParagraph('Керівник практики').style('myHeading').left()
@@ -529,89 +547,89 @@ export default {
 
       tableFooter.getCell(0, 0)
         .addContent(new docx.Paragraph('навчально-методичного управління').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
       tableFooter.getCell(0, 1)
         .addContent(new docx.Paragraph('О. П. Токін').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(1, 0)
         .addContent(new docx.Paragraph(' ').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(1, 1)
         .addContent(new docx.Paragraph(' ').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(2, 0)
         .addContent(new docx.Paragraph('Погоджено:').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(2, 1)
         .addContent(new docx.Paragraph(' ').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(3, 0)
         .addContent(new docx.Paragraph('Проректор з навчальної роботи').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(3, 1)
         .addContent(new docx.Paragraph('О. К. Грищук').style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(4, 0)
         .addContent(new docx.Paragraph(`Декан ${this.facultyTextForApplication}`).style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(4, 1)
         .addContent(new docx.Paragraph(`${this.formatNameReverse(this.faculty.chief)}`).style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(5, 0)
         .addContent(new docx.Paragraph(`Завідувач кафедри ${this.department.name.toLowerCase()}`).style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(5, 1)
         .addContent(new docx.Paragraph(`${this.formatNameReverse(this.department.chief)}`).style('myStyles'))
-        .CellProperties.Borders.addTopBorder(BorderStyle.SINGLE, 1, 'white')
-        .addBottomBorder(BorderStyle.SINGLE, 1, 'white')
-        .addStartBorder(BorderStyle.SINGLE, 1, 'white')
-        .addEndBorder(BorderStyle.SINGLE, 1, 'white')
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
       const packer = new docx.Packer()
       packer.toBlob(doc).then((blob) => {
-        saveAs(blob, `Наказ для ${this.group.alias}-${this.groupCourse}-${this.groupNumber}.docx`)
+        saveAs(blob, `Наказ для ${this.selectedGroups.join(', ')}.docx`)
       })
     },
     formatDate (date) {
@@ -623,7 +641,7 @@ export default {
     },
     formatName (name) {
       const nameArr = name.trim().split(' ')
-      return `${nameArr[0]} ${nameArr[1].charAt(0)}. ${nameArr[2].charAt(0)}.`
+      return nameArr[2] ? `${nameArr[0]} ${nameArr[1].charAt(0)}. ${nameArr[2].charAt(0)}.` : `${nameArr[0]} ${nameArr[1].charAt(0)}.`
     },
     formatNameReverse (name) {
       const nameArr = name.trim().split(' ')

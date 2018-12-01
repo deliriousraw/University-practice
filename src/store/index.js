@@ -9,6 +9,7 @@ import knowledgeBranches from './modules/knowledgeBranches'
 import groups from './modules/groups'
 import students from './modules/students'
 import practices from './modules/practices'
+import practiceLeaders from './modules/practiceLeaders'
 
 Vue.use(Vuex)
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     knowledgeBranches,
     groups,
     students,
-    practices
+    practices,
+    practiceLeaders
   }
 })
