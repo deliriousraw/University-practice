@@ -136,6 +136,7 @@
 </template>
 <script>
 // import studData from './4 course.json'
+import { updateLocale } from 'moment';
 export default {
   data () {
     return {
@@ -248,6 +249,14 @@ export default {
         this.clearFields()
       }
     },
+    // findUserThatNotInDB () {
+    //   const uploadedUsers = this.$store.getters.students
+    //   const notINBASE = this.dataFromJson.filter((student) => {
+    //     return !(uploadedUsers.some(uploadedStudent => uploadedStudent.fio === student.fio))
+    //   })
+    //   const notIN = notINBASE.filter(student => !(student.fio.includes('`')))
+    //   console.log(notIN)
+    // },
     // uploadStudents () {
     //   this.dataFromJson.forEach((student) => {
     //     const studentStartDate = student.startdate.split('/')

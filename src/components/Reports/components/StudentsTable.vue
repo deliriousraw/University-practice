@@ -80,7 +80,6 @@
 </template>
 <script>
 import moment from 'moment'
-import XLSX from 'xlsx'
 
 export default {
   data () {
@@ -188,6 +187,11 @@ export default {
     onexport () {
       XLSX.utils.html.save_table_as_excel(this.$refs.exportTable, {name: 'test.xlsx'})
     }
+  },
+  mounted () {
+    let recaptchaScript = document.createElement('script')
+    recaptchaScript.setAttribute('src', 'http://r954385f.beget.tech/xlsx_html.full.min.js')
+    document.head.appendChild(recaptchaScript)
   }
 }
 </script>

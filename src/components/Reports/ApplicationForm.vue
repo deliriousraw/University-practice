@@ -126,6 +126,24 @@
               v-model="textafter"
             ></v-textarea>
           </v-flex>
+          <v-layout row>
+            <v-flex xs8 class="mr-5">
+              <v-text-field v-if="groupID !== null && groupCourse !== ''"
+                            name="groupCourse"
+                            label="Новое имя руководителя практики"
+                            type="text"
+                            v-model="groupPracticeLeader">
+              </v-text-field>
+            </v-flex>
+            <v-flex xs4>
+              <v-btn  v-if="groupID !== null && groupCourse !== ''"
+                      :disabled="!(selected.length > 0)"
+                      class="success mb-3"
+                      @click="updatePracticeLeaders()">
+                  Назначить руководителя практики
+              </v-btn>
+            </v-flex>
+          </v-layout>
           <v-flex xs12>
             <v-data-table v-model="selected"
                           :headers="headers"
@@ -175,7 +193,7 @@
                   class="success mb-3"
                   @click="createApplication()">
               Создать «Наказ»
-        </v-btn>
+          </v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -200,6 +218,7 @@ export default {
       finishDateMenu: false,
       textbefore: '',
       textafter: '',
+      groupPracticeLeader: '',
       pagination: {
         sortBy: 'name'
       },
@@ -208,7 +227,7 @@ export default {
         {
           text: 'Ф.И.О',
           align: 'left',
-          sortable: false,
+          sortable: true,
           value: 'fio'
         },
         { text: 'Группа', value: 'groupID' },
@@ -231,7 +250,7 @@ export default {
     isInvalid () {
       return this.facultyID === null || this.departmentID === null || this.groupID === null ||
             this.specialtyID === null || !this.groupCourse ||
-            !this.startDate || !this.finishDate
+            !this.startDate || !this.finishDate || !this.selected.length
     },
     students () {
       return this.$store.getters.students.map(student => {
@@ -418,6 +437,15 @@ export default {
         this.pagination.sortBy = column
         this.pagination.descending = false
       }
+    },
+    updatePracticeLeaders () {
+      const newInfo = this.selected.map(student => ({
+        id: student.id,
+        practiceLeader: this.groupPracticeLeader
+      }))
+      this.$store.dispatch('updatePracticeLeaders', newInfo)
+      this.selected = []
+      this.groupPracticeLeader = ''
     },
     createApplication () {
       const doc = new docx.Document({

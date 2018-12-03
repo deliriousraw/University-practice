@@ -28,6 +28,14 @@ export default {
       editedStudent.startDate = payload.startDate
       editedStudent.practicePlace = payload.practicePlace
       editedStudent.practiceLeader = payload.practiceLeader
+    },
+    updatePracticeLeaders (state, payload) {
+      payload.forEach((studentToUpdate) => {
+        const editedStudent = state.students.find(student => {
+          return student.id === studentToUpdate.id
+        })
+        editedStudent.practiceLeader = studentToUpdate.practiceLeader
+      })
     }
   },
   actions: {
@@ -98,6 +106,23 @@ export default {
           practiceLeader: payload.practiceLeader
         })
         commit('updateStudent', payload)
+        commit('setLoading', false)
+      } catch (error) {
+        commit('setLoading', false)
+        commit('setError', error.message)
+        throw error
+      }
+    },
+    async updatePracticeLeaders ({commit}, payload) {
+      commit('clearError')
+      commit('setLoading', true)
+      try {
+        await payload.forEach((student) => {
+          fb.firestore().collection('students').doc(student.id).update({
+            practiceLeader: student.practiceLeader
+          })
+        })
+        commit('updatePracticeLeaders', payload)
         commit('setLoading', false)
       } catch (error) {
         commit('setLoading', false)
