@@ -59,6 +59,27 @@
             </v-flex>
           </v-layout>
           <v-layout row>
+            <v-flex xs8>
+              <v-select
+                :items="computedGroupList"
+                v-model="groupList"
+                label="Список групп для приказа"
+                multiple
+                chips
+                hint="Выбранные группы"
+                persistent-hint
+                disabled>
+              </v-select>
+            </v-flex>
+            <v-flex xs4>
+              <v-btn :disabled="!(groupID !== null && groupCourse !== '' && groupNumber !== '' && selected.length !== 0)"
+                      class="success mb-3"
+                      @click="addGroupToList()">
+                  Добавить группу
+              </v-btn>
+            </v-flex>
+          </v-layout>
+          <v-layout row>
             <v-flex xs6 class="mr-5">
               <v-menu ref="menu"
                       :close-on-content-click="false"
@@ -219,6 +240,9 @@ export default {
       textbefore: '',
       textafter: '',
       groupPracticeLeader: '',
+      computedGroupList: [],
+      groupList: [],
+      selectedGroupList: [],
       pagination: {
         sortBy: 'name'
       },
@@ -248,9 +272,8 @@ export default {
   },
   computed: {
     isInvalid () {
-      return this.facultyID === null || this.departmentID === null || this.groupID === null ||
-            this.specialtyID === null || !this.groupCourse ||
-            !this.startDate || !this.finishDate || !this.selected.length
+      return this.facultyID === null || this.departmentID === null || this.specialtyID === null 
+        || !this.startDate || !this.finishDate || !this.selectedGroupList.length
     },
     students () {
       return this.$store.getters.students.map(student => {
@@ -272,23 +295,23 @@ export default {
         }
       })
     },
-    selectedGroups () {
-      if (this.groupCourse) {
-        if (this.groupNumber) {
-          return [`${this.$store.getters.getGroupById(this.groupID).alias}-${this.groupCourse}-${this.groupNumber}`]
-        } else {
-          const groups = Array.from(new Set(this.selected.map(student => Number(student.groupNumber))))
-          const groupAlias = this.$store.getters.getGroupById(this.groupID).alias
-          return groups.map(group => {
-            return `${groupAlias}-${this.isMasters ? this.groupCourse - 4 : this.groupCourse}-${group}${this.isMasters ? 'м' : ''}${this.groupTeh ? 'тех.' : ''}`
-          }).sort((a, b) => {
-            const first = a
-            const second = b
-            return (first < second) ? -1 : (first > second) ? 1 : 0
-          })
-        }
-      }
-    },
+    // selectedGroups () {
+    //   if (this.groupCourse) {
+    //     if (this.groupNumber) {
+    //       return [`${this.$store.getters.getGroupById(this.groupID).alias}-${this.groupCourse}-${this.groupNumber}`]
+    //     } else {
+    //       const groups = Array.from(new Set(this.selected.map(student => Number(student.groupNumber))))
+    //       const groupAlias = this.$store.getters.getGroupById(this.groupID).alias
+    //       return groups.map(group => {
+    //         return `${groupAlias}-${this.isMasters ? this.groupCourse - 4 : this.groupCourse}-${group}${this.isMasters ? 'м' : ''}${this.groupTeh ? 'тех.' : ''}`
+    //       }).sort((a, b) => {
+    //         const first = a
+    //         const second = b
+    //         return (first < second) ? -1 : (first > second) ? 1 : 0
+    //       })
+    //     }
+    //   }
+    // },
 
     selectedStudents () {
       let sorted = this.students
@@ -315,6 +338,9 @@ export default {
               return student.groupNumber === Number(this.groupNumber)
             })
           }
+          sorted = sorted.filter(student => {
+            return student.groupTeh === this.groupTeh
+          })
         }
       }
       return sorted
@@ -416,6 +442,31 @@ export default {
     }
   },
   methods: {
+    addGroupToList () {
+      const groupInfo = {
+        groupId: this.groupID,
+        groupCourse: this.groupCourse,
+        groupNumber: this.groupNumber,
+        groupTeh: this.groupTeh,
+        students: this.selected
+      }
+
+      this.selectedGroupList.push(groupInfo)
+
+     
+      if (this.groupTeh) {
+        this.groupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}-тех.`)
+        this.computedGroupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}-тех.`)
+      } else {
+        this.groupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}`)
+         this.computedGroupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}`)
+      }
+
+      this.groupID = null
+      this.groupCourse = '' 
+      this.groupNumber = ''
+      this.selected = []
+    },
     getGroupName (groupID) {
       if (groupID !== null) {
         const group = this.groupsLibrary.find(group => {
@@ -451,7 +502,7 @@ export default {
       const doc = new docx.Document({
         creator: 'НТУ',
         title: 'Наказ',
-        description: `Наказ про проходження практики студентами групи ${this.selectedGroups.join(', ')}`
+        description: `Наказ про проходження практики студентами групи ${this.computedGroupList.join(', ')}`
       })
 
       doc.Styles.createParagraphStyle('myStyles', 'My Styles')
@@ -507,7 +558,7 @@ export default {
       groupText.addRun(groupText1)
       doc.addParagraph(groupText)
 
-      doc.createParagraph(`${this.selectedGroups.join(', ')}`).style('myHeading').center()
+      // doc.createParagraph(`${this.selectedGroups.join(', ')}`).style('myHeading').center()
 
       // this.selected.forEach((student, index) => {
       //   const practiceItem = new docx.Paragraph('').style('myHeading').left()
@@ -516,44 +567,93 @@ export default {
       //   doc.addParagraph(practiceItem)
       // })
 
-      const table = doc.createTable(this.selected.length, 4).setWidth(docx.WidthType.PERCENTAGE, '105%')
-      this.selected.sort((a, b) => {
-        const first = a.fio.toLowerCase().trim()
-        const second = b.fio.toLowerCase().trim()
-        return (first < second) ? -1 : (first > second) ? 1 : 0
-      })
-      this.selected.forEach((student, index) => {
-        table
-          .getCell(index, 0)
-          .addContent(new docx.Paragraph(`${index + 1}.`).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-        table
-          .getCell(index, 1)
-          .addContent(new docx.Paragraph(this.formatName(student.fio)).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-        table
-          .getCell(index, 2)
-          .addContent(new docx.Paragraph(student.practicePlace).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-        table
-          .getCell(index, 3)
-          .addContent(new docx.Paragraph(student.practiceLeader).style('myStyles'))
-          .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-          .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+      
+      this.selectedGroupList.forEach((selectedGroup) => {
+        selectedGroup.students.sort((a, b) => {
+          const first = a.fio.toLowerCase().trim()
+          const second = b.fio.toLowerCase().trim()
+          return (first < second) ? -1 : (first > second) ? 1 : 0
+        })
+        let groupName
+        if (selectedGroup.groupTeh) {
+          groupName = `${this.getGroupName(selectedGroup.groupId)}-${selectedGroup.groupCourse}-${selectedGroup.groupNumber}-тех.`
+        } else {
+          groupName = `${this.getGroupName(selectedGroup.groupId)}-${selectedGroup.groupCourse}-${selectedGroup.groupNumber}`
+        }
+        doc.createParagraph(groupName).style('myHeading').center()
+        const groupPracticeLeaders = [...new Set(selectedGroup.students.map(student => student.practiceLeader))]
+        const studentsToApplication = new Map()
+        groupPracticeLeaders.forEach(groupPracticeLeader => {
+          studentsToApplication.set(groupPracticeLeader, [])
+          selectedGroup.students.forEach((student, index) => {
+            if (groupPracticeLeader === student.practiceLeader) {
+              const oldStudents = studentsToApplication.get(groupPracticeLeader)
+              studentsToApplication.set(groupPracticeLeader, [...oldStudents, student])
+            }
+          })
+        })
+
+        const bunchStudents = [...studentsToApplication]
+        bunchStudents.forEach((bunch) => {
+          const table = doc.createTable(bunch[1].length + 1, 3).setWidth(docx.WidthType.PERCENTAGE, '105%')
+          bunch[1].forEach((student, index) => {
+              table
+                .getCell(index, 0)
+                .addContent(new docx.Paragraph(`${index + 1}.`).style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              table
+                .getCell(index, 1)
+                .addContent(new docx.Paragraph(this.formatName(student.fio)).style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              table
+                .getCell(index, 1)
+                .CellProperties.setWidth('40%', docx.WidthType.PERCENTAGE)
+              table
+                .getCell(index, 2)
+                .addContent(new docx.Paragraph(student.practicePlace).style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              table
+                .getCell(index, 2)
+                .CellProperties.setWidth('55%', docx.WidthType.PERCENTAGE)
+          })
+              table
+                .getCell(bunch[1].length, 0)
+                .addContent(new docx.Paragraph(' ').style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              table
+                .getCell(bunch[1].length, 1)
+                .addContent(new docx.Paragraph('Керівник практики').style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              table
+                .getCell(bunch[1].length, 2)
+                .addContent(new docx.Paragraph(bunch[0]).style('myStyles'))
+                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          const tablebreak = new docx.Paragraph('').style('myStyles')
+          const tablebreaktext = new docx.TextRun(' ').break()
+          tablebreak.addRun(tablebreaktext)
+          doc.addParagraph(tablebreak)
+        })
       })
 
-      doc.createParagraph('Керівник практики').style('myHeading').left()
+      // doc.createParagraph('Керівник практики').style('myHeading').left()
       doc.createParagraph('2. Кафедрі забезпечити студентів навчально-методичною літературою.').style('myStyles')
       doc.createParagraph('3. Проїзд та добові витрати на термін практики віднести за рахунок студентів згідно їх заяв.').style('myStyles')
       doc.createParagraph(`4. Контроль за виконанням наказу покласти на декана ${this.facultyTextForApplication} ${this.formatName(this.faculty.chief)}`).style('myStyles')
@@ -657,7 +757,7 @@ export default {
         .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
       const packer = new docx.Packer()
       packer.toBlob(doc).then((blob) => {
-        saveAs(blob, `Наказ для ${this.selectedGroups.join(', ')}.docx`)
+        saveAs(blob, `Наказ для ${this.computedGroupList.join(', ')}.docx`)
       })
     },
     formatDate (date) {

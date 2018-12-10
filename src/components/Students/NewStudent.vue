@@ -135,8 +135,7 @@
   </v-container>
 </template>
 <script>
-// import studData from './4 course.json'
-import { updateLocale } from 'moment';
+// import studData from './data.json'
 export default {
   data () {
     return {
@@ -235,8 +234,8 @@ export default {
           facultyID: this.facultyID,
           groupID: this.groupID,
           specialtyID: this.specialtyID,
-          groupCourse: this.groupCourse,
-          groupNumber: this.groupNumber,
+          groupCourse: Number(this.groupCourse),
+          groupNumber: Number(this.groupNumber),
           groupTeh: this.groupTeh,
           level: this.level,
           studyForm: this.studyForm,
@@ -258,7 +257,7 @@ export default {
     //   console.log(notIN)
     // },
     // uploadStudents () {
-    //   this.dataFromJson.forEach((student) => {
+    //     this.dataFromJson.forEach((student) => {
     //     const studentStartDate = student.startdate.split('/')
     //     const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
     //     const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]

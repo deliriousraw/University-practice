@@ -90,7 +90,7 @@
 </template>
 <script>
 import EditStudent from './EditStudent'
-// import groupToSet from '../../../static/students/ftb/json/БД-4-1.json'
+// import groupToSet from '../../../static/students/ftit/json/УТ-3-2-Т.json'
 
 export default {
   components: {
@@ -227,52 +227,52 @@ export default {
     }
   },
   methods: {
-    /* setGroups () {
-      const formatedGroupToSet = groupToSet.students.map(student => {
-        const studentGroup = student.group.trim().split('-')
-        return {
-          name: student.name.trim().split(/[ ]+/g).join(' '),
-          group_alias: studentGroup[0],
-          group_course: Number(studentGroup[1]),
-          group_number: Number(studentGroup[2]),
-          group_teh: Boolean(studentGroup[3])
-        }
-      })
-      console.log('STUDENTS FROM FILE', formatedGroupToSet)
+    // setGroups () {
+    //   const formatedGroupToSet = groupToSet.students.map(student => {
+    //     const studentGroup = student.group.trim().split('-')
+    //     return {
+    //       name: student.name.trim().split(/[ ]+/g).join(' '),
+    //       group_alias: studentGroup[0],
+    //       group_course: Number(studentGroup[1]),
+    //       group_number: Number(studentGroup[2]),
+    //       group_teh: Boolean(studentGroup[3])
+    //     }
+    //   })
+    //   console.log('STUDENTS FROM FILE', formatedGroupToSet)
 
-      const notFindedinFIREBASE = formatedGroupToSet.filter(student => {
-        return !Boolean(this.students.find((globalStudent) => {
-          return globalStudent.fio === student.name
-        }))
-      })
-      console.log('NOT finded in Firebase', notFindedinFIREBASE)
+    //   const notFindedinFIREBASE = formatedGroupToSet.filter(student => {
+    //     return !Boolean(this.students.find((globalStudent) => {
+    //       return globalStudent.fio === student.name
+    //     }))
+    //   })
+    //   console.log('NOT finded in Firebase', notFindedinFIREBASE)
 
-      let studentWithNewData = []
-      this.students.forEach(student => {
-        const studentData = formatedGroupToSet.find((formatedStudent) => {
-          return student.fio.toLowerCase() === formatedStudent.name.toLowerCase() && student.groupID === null
-        })
-        if (studentData) {
-          studentWithNewData.push({
-            ...student,
-            groupID: this.findGroup(studentData.group_alias),
-            groupCourse: studentData.group_course,
-            groupNumber: studentData.group_number,
-            groupTeh: studentData.group_teh
-          })
-        }
-      })
-      console.log('Array with updated INFO', studentWithNewData)
-      studentWithNewData.forEach(student => {
-        this.$store.dispatch('updateStudent', student)
-      })
-    },
-    findGroup (alias) {
-      const findedGroup = this.sortedGroups.find((group) => {
-        return group.alias === alias
-      })
-      return findedGroup.id ? findedGroup.id : null
-    }, */
+    //   let studentWithNewData = []
+    //   this.students.forEach(student => {
+    //     const studentData = formatedGroupToSet.find((formatedStudent) => {
+    //       return student.fio.toLowerCase() === formatedStudent.name.toLowerCase() && student.groupID === null
+    //     })
+    //     if (studentData) {
+    //       studentWithNewData.push({
+    //         ...student,
+    //         groupID: this.findGroup(studentData.group_alias),
+    //         groupCourse: studentData.group_course,
+    //         groupNumber: studentData.group_number,
+    //         groupTeh: studentData.group_teh
+    //       })
+    //     }
+    //   })
+    //   console.log('Array with updated INFO', studentWithNewData)
+    //   studentWithNewData.forEach(student => {
+    //     this.$store.dispatch('updateStudent', student)
+    //   })
+    // },
+    // findGroup (alias) {
+    //   const findedGroup = this.sortedGroups.find((group) => {
+    //     return group.alias === alias
+    //   })
+    //   return findedGroup.id ? findedGroup.id : null
+    // },
     getGroupName (groupID) {
       if (groupID !== null) {
         const group = this.groups.find(group => {
