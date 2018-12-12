@@ -157,7 +157,7 @@
               </v-text-field>
             </v-flex>
             <v-flex xs4>
-              <v-btn  v-if="groupID !== null && groupCourse !== ''"
+              <v-btn  v-if="groupID !== null && groupCourse !== '' && groupNumber !== ''"
                       :disabled="!(selected.length > 0)"
                       class="success mb-3"
                       @click="updatePracticeLeaders()">
@@ -166,7 +166,8 @@
             </v-flex>
           </v-layout>
           <v-flex xs12>
-            <v-data-table v-model="selected"
+            <v-data-table v-if="groupID !== null && groupCourse !== '' && groupNumber !== ''"
+                          v-model="selected"
                           :headers="headers"
                           :items="selectedStudents"
                           :pagination.sync="pagination"
@@ -272,8 +273,8 @@ export default {
   },
   computed: {
     isInvalid () {
-      return this.facultyID === null || this.departmentID === null || this.specialtyID === null 
-        || !this.startDate || !this.finishDate || !this.selectedGroupList.length
+      return this.facultyID === null || this.departmentID === null || this.specialtyID === null ||
+       !this.startDate || !this.finishDate || !this.selectedGroupList.length
     },
     students () {
       return this.$store.getters.students.map(student => {
@@ -450,20 +451,17 @@ export default {
         groupTeh: this.groupTeh,
         students: this.selected
       }
-
       this.selectedGroupList.push(groupInfo)
-
-     
       if (this.groupTeh) {
         this.groupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}-тех.`)
         this.computedGroupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}-тех.`)
       } else {
         this.groupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}`)
-         this.computedGroupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}`)
+        this.computedGroupList.push(`${this.getGroupName(this.groupID)}-${this.groupCourse}-${this.groupNumber}`)
       }
 
       this.groupID = null
-      this.groupCourse = '' 
+      this.groupCourse = ''
       this.groupNumber = ''
       this.selected = []
     },
@@ -566,8 +564,6 @@ export default {
       //   practiceItem.addRun(practiceItemText)
       //   doc.addParagraph(practiceItem)
       // })
-
-      
       this.selectedGroupList.forEach((selectedGroup) => {
         selectedGroup.students.sort((a, b) => {
           const first = a.fio.toLowerCase().trim()
@@ -597,55 +593,55 @@ export default {
         bunchStudents.forEach((bunch) => {
           const table = doc.createTable(bunch[1].length + 1, 3).setWidth(docx.WidthType.PERCENTAGE, '105%')
           bunch[1].forEach((student, index) => {
-              table
-                .getCell(index, 0)
-                .addContent(new docx.Paragraph(`${index + 1}.`).style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-              table
-                .getCell(index, 1)
-                .addContent(new docx.Paragraph(this.formatName(student.fio)).style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-              table
-                .getCell(index, 1)
-                .CellProperties.setWidth('40%', docx.WidthType.PERCENTAGE)
-              table
-                .getCell(index, 2)
-                .addContent(new docx.Paragraph(student.practicePlace).style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-              table
-                .getCell(index, 2)
-                .CellProperties.setWidth('55%', docx.WidthType.PERCENTAGE)
+            table
+              .getCell(index, 0)
+              .addContent(new docx.Paragraph(`${index + 1}.`).style('myStyles'))
+              .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            table
+              .getCell(index, 1)
+              .addContent(new docx.Paragraph(this.formatName(student.fio)).style('myStyles'))
+              .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            table
+              .getCell(index, 1)
+              .CellProperties.setWidth('40%', docx.WidthType.PERCENTAGE)
+            table
+              .getCell(index, 2)
+              .addContent(new docx.Paragraph(student.practicePlace).style('myStyles'))
+              .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+              .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            table
+              .getCell(index, 2)
+              .CellProperties.setWidth('55%', docx.WidthType.PERCENTAGE)
           })
-              table
-                .getCell(bunch[1].length, 0)
-                .addContent(new docx.Paragraph(' ').style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-              table
-                .getCell(bunch[1].length, 1)
-                .addContent(new docx.Paragraph('Керівник практики').style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
-              table
-                .getCell(bunch[1].length, 2)
-                .addContent(new docx.Paragraph(bunch[0]).style('myStyles'))
-                .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
-                .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          table
+            .getCell(bunch[1].length, 0)
+            .addContent(new docx.Paragraph(' ').style('myStyles'))
+            .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          table
+            .getCell(bunch[1].length, 1)
+            .addContent(new docx.Paragraph('Керівник практики').style('myStyles'))
+            .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+          table
+            .getCell(bunch[1].length, 2)
+            .addContent(new docx.Paragraph(bunch[0]).style('myStyles'))
+            .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+            .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
           const tablebreak = new docx.Paragraph('').style('myStyles')
           const tablebreaktext = new docx.TextRun(' ').break()
           tablebreak.addRun(tablebreaktext)

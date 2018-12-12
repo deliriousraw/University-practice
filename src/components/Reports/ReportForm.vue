@@ -23,11 +23,12 @@
               </v-select>
             </v-flex>
             <v-flex xs4>
-              <v-select v-if="facultyID !== null"
-                        :items="specialties"
-                        v-model="specialtyID"
-                        label="Специальности">
-              </v-select>
+              <v-text-field v-if="facultyID !== null"
+                            name="practiceDuration"
+                            label="Продолжительность практики"
+                            type="text"
+                            v-model="practiceDuration">
+              </v-text-field>
             </v-flex>
           </v-layout>
           <v-layout row>
@@ -109,32 +110,15 @@
             </v-flex>
           </v-layout>
           <v-flex xs12>
-            <v-textarea v-if="facultyID !== null && specialtyID !== null"
-              solo
-              name="text-before"
-              label="Текст перед наказом"
-              :value="textbeforeAPP"
-              v-model="textbefore"
-            ></v-textarea>
-          </v-flex>
-          <v-flex xs12>
-            <v-textarea v-if="facultyID !== null && departmentID !== null"
-              solo
-              name="text-before"
-              label="Текст після наказу"
-              :value="textafterAPP"
-              v-model="textafter"
-            ></v-textarea>
-          </v-flex>
-          <v-flex xs12>
-            <v-data-table v-model="selected"
+            <v-data-table v-if="groupID !== null && groupCourse !== '' && groupNumber !== ''"
+                          v-model="selected"
                           :headers="headers"
                           :items="selectedStudents"
                           :pagination.sync="pagination"
                           select-all
                           item-key="fio"
                           class="elevation-1">
-              <template slot="headers" slot-scope="props">
+              <template slot="items" slot-scope="props">
                 <tr>
                   <th>
                     <v-checkbox :input-value="props.all"
@@ -161,22 +145,24 @@
                                 hide-details>
                     </v-checkbox>
                   </td>
-                  <td class="text-xs-left">{{ props.item.fio }}</td>
-                  <td class="text-xs-right">{{ getGroupName(props.item.groupID) }}</td>
-                  <td class="text-xs-right">{{ props.item.groupCourse }}</td>
-                  <td class="text-xs-right">{{ props.item.groupNumber }}</td>
-                  <td class="text-xs-right">{{ props.item.practicePlace }}</td>
-                  <td class="text-xs-right">{{ props.item.practiceLeader }}</td>
+                  <td>{{ props.item.fio }}</td>
+                  <td>{{ getGroupName(props.item.groupID) }}</td>
+                  <td>{{ props.item.groupCourse }}</td>
+                  <td>{{ props.item.groupNumber }}</td>
+                  <td>{{ props.item.practicePlace }}</td>
+                  <td>{{ props.item.practiceLeader }}</td>
                 </tr>
               </template>
             </v-data-table>
           </v-flex>
-          <v-btn :disabled="!facultyID"
-                  class="success mb-3"
-                  @click="createApplication()">
-              Создать «Наказ»
-          </v-btn>
-          <StudentsTable />
+          <StudentsTable  v-if="!isInvalid" 
+                          :faculty="faculty"
+                          :department="department"
+                          :group="groupForApplication"
+                          :startDate="startDate"
+                          :finishDate="finishDate" 
+                          :students="studentsToReport"
+                          :practiceDuration="practiceDuration" />
       </v-flex>
     </v-layout>
   </v-container>
@@ -193,7 +179,6 @@ export default {
       facultyID: null,
       departmentID: null,
       groupID: null,
-      specialtyID: null,
       groupCourse: '',
       groupNumber: '',
       groupTeh: false,
@@ -201,8 +186,8 @@ export default {
       finishDate: '',
       startDateMenu: false,
       finishDateMenu: false,
-      textbefore: '',
-      textafter: '',
+      passedStudents: [],
+      practiceDuration: '',
       pagination: {
         sortBy: 'name'
       },
@@ -211,7 +196,7 @@ export default {
         {
           text: 'Ф.И.О',
           align: 'left',
-          sortable: false,
+          sortable: true,
           value: 'fio'
         },
         { text: 'Группа', value: 'groupID' },
@@ -231,6 +216,10 @@ export default {
     }
   },
   computed: {
+    isInvalid () {
+      return this.facultyID === null || this.departmentID === null || this.groupID === null || 
+      !this.groupCourse || !this.groupNumber || !this.startDate || !this.finishDate || !this.studentsToReport.length
+    },
     students () {
       return this.$store.getters.students.map(student => {
         return {
@@ -258,36 +247,43 @@ export default {
           return student.facultyID === this.facultyID
         })
       }
-      // if (this.departmentID) {
-      //   sorted = sorted.filter(student => {
-      //     return student.specialtyID === this.departmentID
-      //   })
-      // }
       if (this.groupID) {
         sorted = sorted.filter(student => {
           return student.groupID === this.groupID
         })
         if (this.groupCourse.length !== 0) {
           sorted = sorted.filter(student => {
-            return student.groupCourse === this.groupCourse
+            return student.groupCourse === Number(this.groupCourse)
           })
           if (this.groupNumber.length !== 0) {
             sorted = sorted.filter(student => {
-              return student.groupNumber === this.groupNumber
+              return student.groupNumber === Number(this.groupNumber)
             })
           }
+          sorted = sorted.filter(student => {
+            return student.groupTeh === this.groupTeh
+          })
         }
       }
       return sorted
     },
-    textbeforeAPP () {
-      return `Згідно з навчальним  планом підготовки фахівців ОР «Бакалавр» напряму ${this.specialty.code} «${this.specialty.name}» ${this.faculty.name} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
-    },
-    textafterAPP () {
-      return `1.Направити студентів третього курсу на переддипломну практику студентів, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
-    },
-    specialty () {
-      return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
+    studentsToReport () {
+      const allStudents = this.selectedStudents.slice()
+      return allStudents.map(student => {
+        if (this.selected.length && this.selected.some(selectedStudent => {
+          return selectedStudent.id === student.id
+        })) {
+          return {
+            ...student,
+            practieStatus: true
+          }
+        } else {
+          return {
+            ...student,
+            practieStatus: false
+          }
+        }
+      })
     },
     faculty () {
       return this.facultyID !== null ? this.$store.getters.getFacultiesById(this.facultyID) : {name: ''}
@@ -331,19 +327,19 @@ export default {
         }
       })
     },
-    specialties () {
-      return this.$store.getters.specialties.map(specialty => {
-        return {
-          text: `${specialty.code} ${specialty.name}`,
-          value: specialty.id
-        }
-      })
+    isMasters () {
+      return Number(this.groupCourse) > 4
     },
-    magister () {
-      return this.groupCourse > 4
+    groupForApplication () {
+      return this.isMasters ? `${this.group.alias}-${Number(this.groupCourse) - 4}-${this.groupNumber}м.` : `${this.group.alias}-${this.groupCourse}-${this.groupNumber}${this.groupTeh ? '-тех.' : ''}`
     }
   },
   methods: {
+    deleteItem (item) {
+      const index = this.selectedStudents.indexOf(item)
+      console.log(this.selectedStudents.splice(index, 1))
+      confirm('Вы уверены что хотите убрать студента из отчёта ?') && this.selectedStudents.splice(index, 1)
+    },
     getGroupName (groupID) {
       if (groupID !== null) {
         const group = this.groupsLibrary.find(group => {
@@ -366,37 +362,14 @@ export default {
         this.pagination.descending = false
       }
     },
-    createApplication () {
-      // TODO
-    },
-    formatDate (date) {
-      const created = new Date(date)
-      const day = created.getDate() < 10 ? '0' + created.getDate() : created.getDate()
-      const month = (created.getMonth() + 1) < 10 ? '0' + (created.getMonth() + 1) : created.getMonth() + 1
-      const year = created.getFullYear()
-      return `${day}.${month}.${year}`
-    },
-    formatName (name) {
-      const nameArr = name.split(' ')
-      return `${nameArr[0]} ${nameArr[1].charAt(0)}. ${nameArr[2].charAt(0)}.`
-    },
-    formatNameReverse (name) {
-      const nameArr = name.split(' ')
-      return `${nameArr[1].charAt(0)}. ${nameArr[2].charAt(0)}. ${nameArr[0]}`
-    }
   },
   watch: {
-    textbeforeAPP () {
-      this.textbefore = this.textbeforeAPP
-    },
-    textafterAPP () {
-      this.textafter = this.textafterAPP
-    },
     facultyID () {
       this.departmentID = null
       this.groupID = null
       this.groupCourse = ''
       this.groupNumber = ''
+      this.groupTeh = false
     }
   }
 }
