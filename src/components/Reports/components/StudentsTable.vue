@@ -83,6 +83,7 @@
 </template>
 <script>
 import moment from 'moment'
+import TableToExcel from '@linways/table-to-excel'
 
 export default {
   props: {
@@ -162,13 +163,8 @@ export default {
       }, 0)
     },
     onexport () {
-      XLSX.utils.html.save_table_as_excel(this.$refs.exportTable, {name: `Звіт ${this.group}.xlsx`})
+      TableToExcel.convert(this.$refs.exportTable, {name: `Звіт ${this.group}.xlsx`})
     }
-  },
-  mounted () {
-    let recaptchaScript = document.createElement('script')
-    recaptchaScript.setAttribute('src', 'http://r954385f.beget.tech/xlsx_html.full.min.js')
-    document.head.appendChild(recaptchaScript)
   }
 }
 </script>
