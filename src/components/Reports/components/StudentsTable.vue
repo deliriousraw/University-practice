@@ -83,7 +83,7 @@
 </template>
 <script>
 import moment from 'moment'
-import TableToExcel from '@linways/table-to-excel'
+// import TableToExcel from '@linways/table-to-excel'
 
 export default {
   props: {
