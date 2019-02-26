@@ -163,6 +163,7 @@ export default {
       }, 0)
     },
     onexport () {
+      // eslint-disable-next-line
       TableToExcel.convert(this.$refs.exportTable, {name: `Звіт ${this.group}.xlsx`})
     }
   }

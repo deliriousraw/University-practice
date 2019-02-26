@@ -16,11 +16,11 @@
               </v-select>
             </v-flex>
             <v-flex xs4 class="mr-5">
-              <v-select v-if="facultyID !== null"
-                        :items="groups"
-                        v-model="groupID"
-                        label="Группа">
-              </v-select>
+              <v-combobox v-if="facultyID !== null"
+                          v-model="groupID"
+                          :items="groups"
+                          label="Группа">
+              </v-combobox>
             </v-flex>
             <v-flex xs4>
               <v-text-field v-if="facultyID !== null"
@@ -217,7 +217,7 @@ export default {
   },
   computed: {
     isInvalid () {
-      return this.facultyID === null || this.departmentID === null || this.groupID === null || 
+      return this.facultyID === null || this.departmentID === null || this.groupID === null ||
       !this.groupCourse || !this.groupNumber || !this.startDate || !this.finishDate || !this.studentsToReport.length
     },
     students () {
@@ -303,9 +303,14 @@ export default {
       })
     },
     departments () {
-      const filteredDepartments = this.$store.getters.departments.filter((department) => {
-        return department.facultyId === this.facultyID
-      })
+      let filteredDepartments = []
+      if (this.facultyID !== 'H8puzgFjjk2npeeda1UZ' && this.facultyID !== 'PTOfU3alUH3BKseCWHHt') {
+        filteredDepartments = this.$store.getters.departments.filter((department) => {
+          return department.facultyId === this.facultyID
+        })
+      } else {
+        filteredDepartments = this.$store.getters.departments
+      }
       return filteredDepartments.map(department => {
         return {
           text: department.name,
@@ -361,7 +366,7 @@ export default {
         this.pagination.sortBy = column
         this.pagination.descending = false
       }
-    },
+    }
   },
   watch: {
     facultyID () {

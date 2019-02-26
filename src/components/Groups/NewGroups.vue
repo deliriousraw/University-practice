@@ -17,7 +17,7 @@
                         v-model="name">
           </v-text-field>
           <v-select :items="faculties"
-                    v-model="facultyId"
+                    v-model="filterFacultyId"
                     label="Факультет">
           </v-select>
         </v-form>
@@ -28,6 +28,10 @@
         </v-btn>
         <v-layout row>
           <v-flex xs12>
+              <v-select :items="faculties"
+                        v-model="filterFacultyId"
+                        label="Отфильтровать по факультету">
+              </v-select>
             <v-list>
               <v-list-tile
                 v-for="(item, index) in groups"
@@ -57,7 +61,8 @@ export default {
       alias: '',
       name: '',
       facultyId: null,
-      valid: false
+      valid: false,
+      filterFacultyId: null
     }
   },
   computed: {
@@ -70,7 +75,7 @@ export default {
       })
     },
     groups () {
-      return this.$store.getters.groups
+      return this.filterFacultyId ? this.$store.getters.groups.filter(group => group.facultyId === this.filterFacultyId) : this.$store.getters.groups
     }
   },
   methods: {

@@ -29,10 +29,11 @@
 
           <v-layout row>
             <v-flex xs4 class="mr-5">
-              <v-select :items="groups"
-                        v-model="groupID"
-                        label="Группа">
-              </v-select>
+              <v-combobox v-if="facultyID !== null"
+                          v-model="groupID"
+                          :items="groups"
+                          label="Группа">
+              </v-combobox>
             </v-flex>
             <v-flex xs3 class="mr-5">
               <v-text-field name="groupCourse"
