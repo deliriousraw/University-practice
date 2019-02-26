@@ -38,10 +38,10 @@
 
               <v-layout row>
                 <v-flex xs4 class="mr-5">
-                  <v-combobox v-model="groupID"
-                              :items="groups"
-                              label="Группа">
-                  </v-combobox>
+                  <v-autocomplete v-model="groupID"
+                                  :items="groups"
+                                  label="Группа">
+                  </v-autocomplete>
                 </v-flex>
                 <v-flex xs3 class="mr-5">
                   <v-text-field name="groupCourse"
