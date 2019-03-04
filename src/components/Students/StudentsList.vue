@@ -16,11 +16,11 @@
     </v-layout>
     <v-layout row>
       <v-flex xs4 class="mr-5">
-        <v-select v-if="facultyID !== null"
+        <v-autocomplete v-if="facultyID !== null"
                   :items="groupsLibrary"
                   v-model="groupID"
                   label="Группа">
-        </v-select>
+        </v-autocomplete>
       </v-flex>
       <v-flex xs4 class="mr-5">
         <v-text-field v-if="groupID !== null"
@@ -226,6 +226,13 @@ export default {
       return specialties
     }
   },
+  watch: {
+    facultyID () {
+      this.groupID = null
+      this.groupCourse = ''
+      this.groupNumber = ''
+    }
+  },
   methods: {
     // setGroups () {
     //   const formatedGroupToSet = groupToSet.students.map(student => {
@@ -273,12 +280,17 @@ export default {
     //   })
     //   return findedGroup.id ? findedGroup.id : null
     // },
-    getGroupName (groupID) {
+    getGroupName (groupID, item) {
       if (groupID !== null) {
         const group = this.groups.find(group => {
           return group.id === groupID
         })
-        return group.alias
+        if (group) {
+          return group.alias
+        } else {
+          console.log(item)
+          return 'Без группы'
+        }
       } else {
         return 'Без группы'
       }

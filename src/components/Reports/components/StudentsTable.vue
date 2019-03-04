@@ -144,7 +144,7 @@ export default {
       const surname = this.findMax('surname') + 2
       const studyForm = 10
       const practiceDuration = 8
-      const practicePlace = this.findMax('practicePlace') + 2
+      const practicePlace = Math.max(15, this.findMax('practicePlace') + 2)
       const practiceLeader = Math.max(20, this.findMax('practiceLeader'))
       const practieStatus = 10
       return [studentIndex, lastname, firstname, surname, studyForm, practiceDuration, practicePlace, practiceLeader, practieStatus].join()
@@ -159,7 +159,7 @@ export default {
   methods: {
     findMax (field) {
       return this.parsedStudents.reduce((max, student) => {
-        return Math.max(max, student[field].length)
+        return Math.max(max, student[field] ? student[field].length : 0)
       }, 0)
     },
     onexport () {

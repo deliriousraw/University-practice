@@ -261,7 +261,7 @@ export default {
             })
           }
           sorted = sorted.filter(student => {
-            return student.groupTeh === this.groupTeh
+            return Boolean(student.groupTeh) === this.groupTeh
           })
         }
       }
