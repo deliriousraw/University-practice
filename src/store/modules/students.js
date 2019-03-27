@@ -2,14 +2,18 @@ import * as fb from 'firebase'
 
 export default {
   state: {
-    students: []
+    students: [],
+    requests: []
   },
   mutations: {
     createStudent (state, payload) {
       state.students.push(payload)
     },
+    addRequest (state, payload) {
+      state.requests.push(payload)
+    },
     loadStudents (state, payload) {
-      state.students = payload
+      state.students = [...state.students, ...payload]
     },
     updateStudent (state, payload) {
       const editedStudent = state.students.find(student => {
@@ -56,28 +60,36 @@ export default {
     async fetchStudents ({commit}, payload) {
       commit('clearError')
       commit('setLoading', true)
+      commit('addRequest', payload)
       try {
         let students = []
-        await fb.firestore().collection('students').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            students.push({
-              id: doc.id,
-              fio: doc.data().fio,
-              facultyID: doc.data().facultyID,
-              groupID: doc.data().groupID,
-              specialtyID: doc.data().specialtyID,
-              groupCourse: doc.data().groupCourse,
-              groupNumber: doc.data().groupNumber,
-              groupTeh: doc.data().groupTeh,
-              level: doc.data().level,
-              studyForm: doc.data().studyForm,
-              financing: doc.data().financing,
-              startDate: doc.data().startDate,
-              practicePlace: doc.data().practicePlace,
-              practiceLeader: doc.data().practiceLeader
+        await fb.firestore().collection('students')
+          .where('facultyID', '==', payload.facultyID)
+          .where('groupID', '==', payload.groupID)
+          .where('groupCourse', '==', Number(payload.groupCourse))
+          .where('groupNumber', '==', Number(payload.groupNumber))
+          .where('groupTeh', '==', payload.groupTeh)
+          .get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              students.push({
+                id: doc.id,
+                fio: doc.data().fio,
+                facultyID: doc.data().facultyID,
+                groupID: doc.data().groupID,
+                specialtyID: doc.data().specialtyID,
+                groupCourse: doc.data().groupCourse,
+                groupNumber: doc.data().groupNumber,
+                groupTeh: doc.data().groupTeh,
+                level: doc.data().level,
+                studyForm: doc.data().studyForm,
+                financing: doc.data().financing,
+                startDate: doc.data().startDate,
+                practicePlace: doc.data().practicePlace,
+                practiceLeader: doc.data().practiceLeader
+              })
             })
           })
-        })
+        console.log(students)
         commit('loadStudents', students)
         commit('setLoading', false)
       } catch (error) {
@@ -137,6 +149,9 @@ export default {
     },
     getStudentById: state => id => {
       return state.students.find(student => student.id === id)
+    },
+    requests (state) {
+      return state.requests
     }
   }
 }

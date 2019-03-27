@@ -16,11 +16,11 @@
               </v-select>
             </v-flex>
             <v-flex xs4 class="mr-5">
-              <v-combobox v-if="facultyID !== null"
+              <v-autocomplete v-if="facultyID !== null"
                           v-model="groupID"
                           :items="groups"
                           label="Группа">
-              </v-combobox>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs4>
               <v-select v-if="facultyID !== null"
@@ -224,6 +224,7 @@
 import * as docx from 'docx'
 import saveAs from 'file-saver'
 
+import {equals} from '../../util'
 export default {
   data () {
     return {
@@ -448,6 +449,22 @@ export default {
     }
   },
   methods: {
+    fetchStudents () {
+      if (this.facultyID !== null && this.groupID !== null && this.groupCourse && this.groupNumber) {
+        const requestedStudents = {
+          facultyID: this.facultyID,
+          groupID: this.groupID,
+          groupCourse: this.groupCourse,
+          groupNumber: this.groupNumber,
+          groupTeh: this.groupTeh
+        }
+        const oldRequests = this.$store.getters.requests
+        const isRequested = oldRequests.some(req => equals(req, requestedStudents))
+        if (!isRequested) {
+          this.$store.dispatch('fetchStudents', requestedStudents)
+        }
+      }
+    },
     addGroupToList () {
       const groupInfo = {
         groupId: this.groupID,
@@ -789,6 +806,19 @@ export default {
       this.groupID = null
       this.groupCourse = ''
       this.groupNumber = ''
+      this.fetchStudents()
+    },
+    groupID () {
+      this.fetchStudents()
+    },
+    groupCourse () {
+      this.fetchStudents()
+    },
+    groupNumber () {
+      this.fetchStudents()
+    },
+    groupTeh () {
+      this.fetchStudents()
     }
   }
 }
