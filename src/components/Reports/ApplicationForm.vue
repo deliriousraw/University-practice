@@ -274,8 +274,7 @@ export default {
   },
   computed: {
     isInvalid () {
-      return this.facultyID === null || this.departmentID === null || this.specialtyID === null ||
-       !this.startDate || !this.finishDate || !this.selectedGroupList.length
+      return this.facultyID === null || this.departmentID === null || this.specialtyID === null || !this.startDate || !this.finishDate || !this.selectedGroupList.length
     },
     students () {
       return this.$store.getters.students.map(student => {
@@ -327,6 +326,7 @@ export default {
       //     return student.specialtyID === this.departmentID
       //   })
       // }
+      console.log(sorted)
       if (this.groupID) {
         sorted = sorted.filter(student => {
           return student.groupID === this.groupID
@@ -341,7 +341,7 @@ export default {
             })
           }
           sorted = sorted.filter(student => {
-            return student.groupTeh === this.groupTeh
+            return Boolean(student.groupTeh) === this.groupTeh
           })
         }
       }
