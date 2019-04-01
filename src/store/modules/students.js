@@ -6,6 +6,11 @@ export default {
     requests: []
   },
   mutations: {
+    initialiseStore (state) {
+      if (localStorage.getItem('store')) {
+        Object.assign(state.students, JSON.parse(localStorage.getItem('store')))
+      }
+    },
     createStudent (state, payload) {
       state.students.push(payload)
     },
@@ -14,6 +19,9 @@ export default {
     },
     loadStudents (state, payload) {
       state.students = [...state.students, ...payload]
+    },
+    loadAllStudents (state, payload) {
+      state.students = payload
     },
     updateStudent (state, payload) {
       const editedStudent = state.students.find(student => {
@@ -90,6 +98,40 @@ export default {
             })
           })
         console.log(students)
+        commit('loadAllStudents', students)
+        commit('setLoading', false)
+      } catch (error) {
+        commit('setLoading', false)
+        commit('setError', error.message)
+        throw error
+      }
+    },
+    async fetchALLStudents ({commit}, payload) {
+      commit('clearError')
+      commit('setLoading', true)
+      try {
+        let students = []
+        await fb.firestore().collection('students').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            students.push({
+              id: doc.id,
+              fio: doc.data().fio,
+              facultyID: doc.data().facultyID,
+              groupID: doc.data().groupID,
+              specialtyID: doc.data().specialtyID,
+              groupCourse: doc.data().groupCourse,
+              groupNumber: doc.data().groupNumber,
+              groupTeh: doc.data().groupTeh,
+              level: doc.data().level,
+              studyForm: doc.data().studyForm,
+              financing: doc.data().financing,
+              startDate: doc.data().startDate,
+              practicePlace: doc.data().practicePlace,
+              practiceLeader: doc.data().practiceLeader
+            })
+          })
+        })
+        localStorage.setItem('store', JSON.stringify(students))
         commit('loadStudents', students)
         commit('setLoading', false)
       } catch (error) {
@@ -102,7 +144,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        await fb.firestore().collection('students').doc(payload.id).set({
+        const updated = await fb.firestore().collection('students').doc(payload.id).set({
           fio: payload.fio,
           facultyID: payload.facultyID,
           groupID: payload.groupID,
@@ -117,6 +159,7 @@ export default {
           practicePlace: payload.practicePlace,
           practiceLeader: payload.practiceLeader
         })
+        console.log(updated)
         commit('updateStudent', payload)
         commit('setLoading', false)
       } catch (error) {

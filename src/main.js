@@ -19,6 +19,9 @@ new Vue({
   store,
   components: { App },
   template: '<App/>',
+  beforeCreate () {
+    this.$store.commit('initialiseStore')
+  },
   created () {
     var config = {
       apiKey: 'AIzaSyAy7nr1mhEESekmox9B1Pw6GXKKphSRt1k',
@@ -44,6 +47,8 @@ new Vue({
     this.$store.dispatch('fetchSpecialties')
     this.$store.dispatch('fetchKnowledgeBranches')
     this.$store.dispatch('fetchGroups')
-    // this.$store.dispatch('fetchStudents')
+    if (!localStorage.getItem('store')) {
+      this.$store.dispatch('fetchALLStudents')
+    }
   }
 })

@@ -252,13 +252,13 @@ export default {
     // findUserThatNotInDB () {
     //   const uploadedUsers = this.$store.getters.students
     //   const notINBASE = this.dataFromJson.filter((student) => {
-    //     return !(uploadedUsers.some(uploadedStudent => uploadedStudent.fio === student.fio))
+    //     return !(uploadedUsers.some(uploadedStudent => uploadedStudent.fio === student.fio.trim()))
     //   })
     //   const notIN = notINBASE.filter(student => !(student.fio.includes('`')))
     //   console.log(notIN)
     // },
     // uploadStudents () {
-    //     this.dataFromJson.forEach((student) => {
+    //     this.dataFromJson.forEach((student, index) => {
     //     const studentStartDate = student.startdate.split('/')
     //     const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
     //     const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
@@ -274,6 +274,7 @@ export default {
     //     const realFacultyID = this.$store.getters.faculties.find(faculty => {
     //       return faculty.name === student.department
     //     })
+    //     const isGroupTech = student.isShortTerm === 'Ні' ? false : true
 
     //     const studentInfo = {
     //       fio: student.fio,
@@ -284,16 +285,18 @@ export default {
     //       groupNumber: '',
     //       practicePlace: '',
     //       practiceLeader: '',
-    //       groupTeh: null,
+    //       groupTeh: isGroupTech,
     //       level: student.level,
     //       studyForm: student.studyForm,
     //       financing: student.financing,
     //       startDate: realDay
     //     }
     //     // return studentInfo
+    //     console.log(`student - ${index} = u[loaded`)
     //     this.$store.dispatch('createStudent', studentInfo)
     //   })
     //   // console.log(uploadedUsers)
+    //   // console.log('ok - ALL FINISHED!')
     // },
     clearFields () {
       this.fio = ''

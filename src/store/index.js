@@ -13,6 +13,12 @@ import practiceLeaders from './modules/practiceLeaders'
 
 Vue.use(Vuex)
 
+const myPlugin = store => {
+  store.subscribe((mutation, state) => {
+    localStorage.setItem('store', JSON.stringify(state.students.students))
+  })
+}
+
 export default new Vuex.Store({
   modules: {
     user,
@@ -25,5 +31,6 @@ export default new Vuex.Store({
     students,
     practices,
     practiceLeaders
-  }
+  },
+  plugins: [myPlugin]
 })

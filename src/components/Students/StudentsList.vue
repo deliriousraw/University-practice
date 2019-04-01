@@ -90,7 +90,7 @@
 </template>
 <script>
 import EditStudent from './EditStudent'
-// import groupToSet from '../../../static/students/ftit/json/УТ-3-2-Т.json'
+// import groupToSet from '../../static/ftit/УТ-1-1-М.json'
 
 export default {
   components: {
@@ -228,12 +228,13 @@ export default {
   },
   methods: {
     // setGroups () {
-    //   const formatedGroupToSet = groupToSet.students.map(student => {
+    //   console.log('ok', groupToSet)
+    //   const formatedGroupToSet = groupToSet.map(student => {
     //     const studentGroup = student.group.trim().split('-')
     //     return {
     //       name: student.name.trim().split(/[ ]+/g).join(' '),
     //       group_alias: studentGroup[0],
-    //       group_course: Number(studentGroup[1]),
+    //       group_course: Number(studentGroup[1])+4,
     //       group_number: Number(studentGroup[2]),
     //       group_teh: Boolean(studentGroup[3])
     //     }
@@ -242,7 +243,7 @@ export default {
 
     //   const notFindedinFIREBASE = formatedGroupToSet.filter(student => {
     //     return !Boolean(this.students.find((globalStudent) => {
-    //       return globalStudent.fio === student.name
+    //       return globalStudent.fio.trim() === student.name
     //     }))
     //   })
     //   console.log('NOT finded in Firebase', notFindedinFIREBASE)
@@ -250,7 +251,7 @@ export default {
     //   let studentWithNewData = []
     //   this.students.forEach(student => {
     //     const studentData = formatedGroupToSet.find((formatedStudent) => {
-    //       return student.fio.toLowerCase() === formatedStudent.name.toLowerCase() && student.groupID === null
+    //       return student.fio.toLowerCase().trim() === formatedStudent.name.toLowerCase() && student.groupID === null
     //     })
     //     if (studentData) {
     //       studentWithNewData.push({
@@ -267,12 +268,12 @@ export default {
     //     this.$store.dispatch('updateStudent', student)
     //   })
     // },
-    // findGroup (alias) {
-    //   const findedGroup = this.sortedGroups.find((group) => {
-    //     return group.alias === alias
-    //   })
-    //   return findedGroup.id ? findedGroup.id : null
-    // },
+    findGroup (alias) {
+      const findedGroup = this.sortedGroups.find((group) => {
+        return group.alias === alias
+      })
+      return findedGroup.id ? findedGroup.id : null
+    },
     getGroupName (groupID) {
       if (groupID !== null) {
         const group = this.groups.find(group => {
