@@ -10,6 +10,9 @@ export default {
       if (localStorage.getItem('store')) {
         Object.assign(state.students, JSON.parse(localStorage.getItem('store')))
       }
+      if (localStorage.getItem('requests')) {
+        Object.assign(state.requests, JSON.parse(localStorage.getItem('requests')))
+      }
     },
     createStudent (state, payload) {
       state.students.push(payload)
@@ -22,6 +25,10 @@ export default {
     },
     loadAllStudents (state, payload) {
       state.students = payload
+    },
+    clearStorage (state, payload) {
+      state.students = []
+      state.requests = []
     },
     updateStudent (state, payload) {
       const editedStudent = state.students.find(student => {
@@ -97,8 +104,7 @@ export default {
               })
             })
           })
-        console.log(students)
-        commit('loadAllStudents', students)
+        commit('loadStudents', students)
         commit('setLoading', false)
       } catch (error) {
         commit('setLoading', false)

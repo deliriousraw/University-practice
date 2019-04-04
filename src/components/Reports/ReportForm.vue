@@ -169,7 +169,7 @@
 </template>
 <script>
 import StudentsTable from './components/StudentsTable'
-
+import {equals} from '../../util'
 export default {
   components: {
     StudentsTable
@@ -340,6 +340,22 @@ export default {
     }
   },
   methods: {
+    fetchStudents () {
+      if (this.facultyID !== null && this.groupID !== null && this.groupCourse && this.groupNumber) {
+        const requestedStudents = {
+          facultyID: this.facultyID,
+          groupID: this.groupID,
+          groupCourse: this.groupCourse,
+          groupNumber: this.groupNumber,
+          groupTeh: this.groupTeh
+        }
+        const oldRequests = this.$store.getters.requests
+        const isRequested = oldRequests.some(req => equals(req, requestedStudents))
+        if (!isRequested) {
+          this.$store.dispatch('fetchStudents', requestedStudents)
+        }
+      }
+    },
     deleteItem (item) {
       const index = this.selectedStudents.indexOf(item)
       console.log(this.selectedStudents.splice(index, 1))
@@ -375,6 +391,19 @@ export default {
       this.groupCourse = ''
       this.groupNumber = ''
       this.groupTeh = false
+      this.fetchStudents()
+    },
+    groupID () {
+      this.fetchStudents()
+    },
+    groupCourse () {
+      this.fetchStudents()
+    },
+    groupNumber () {
+      this.fetchStudents()
+    },
+    groupTeh () {
+      this.fetchStudents()
     }
   }
 }

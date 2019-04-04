@@ -22,7 +22,7 @@
                   label="Группа">
         </v-autocomplete>
       </v-flex>
-      <v-flex xs4 class="mr-5">
+      <v-flex xs3 class="mr-5">
         <v-text-field v-if="groupID !== null"
                       name="groupCourse"
                       label="Курс группы"
@@ -32,7 +32,7 @@
                       v-model="groupCourse">
         </v-text-field>
       </v-flex>
-      <v-flex xs4 class="mr-5">
+      <v-flex xs3 class="mr-5">
         <v-text-field v-if="groupID !== null"
                       name="groupNumber"
                       label="Номер группы"
@@ -41,6 +41,12 @@
                       max="10"
                       v-model="groupNumber">
         </v-text-field>
+      </v-flex>
+      <v-flex xs2 class="mr-5">
+        <v-switch v-if="groupID !== null"
+                  :label="`Техникум`"
+                  v-model="groupTeh">
+        </v-switch>
       </v-flex>
     </v-layout>
     <v-layout row>
@@ -91,7 +97,7 @@
 <script>
 import EditStudent from './EditStudent'
 // import groupToSet from '../../static/ftit/УТ-1-1-М.json'
-
+import {equals} from '../../util'
 export default {
   components: {
     EditStudent
@@ -103,6 +109,7 @@ export default {
       specialtyID: null,
       groupCourse: '',
       groupNumber: '',
+      groupTeh: false,
       search: '',
       headers: [
         {
@@ -231,6 +238,20 @@ export default {
       this.groupID = null
       this.groupCourse = ''
       this.groupNumber = ''
+      this.groupTeh = false
+      this.fetchStudents()
+    },
+    groupID () {
+      this.fetchStudents()
+    },
+    groupCourse () {
+      this.fetchStudents()
+    },
+    groupNumber () {
+      this.fetchStudents()
+    },
+    groupTeh () {
+      this.fetchStudents()
     }
   },
   methods: {
@@ -294,6 +315,22 @@ export default {
         }
       } else {
         return 'Без группы'
+      }
+    },
+    fetchStudents () {
+      if (this.facultyID !== null && this.groupID !== null && this.groupCourse && this.groupNumber) {
+        const requestedStudents = {
+          facultyID: this.facultyID,
+          groupID: this.groupID,
+          groupCourse: this.groupCourse,
+          groupNumber: this.groupNumber,
+          groupTeh: this.groupTeh
+        }
+        const oldRequests = this.$store.getters.requests
+        const isRequested = oldRequests.some(req => equals(req, requestedStudents))
+        if (!isRequested) {
+          this.$store.dispatch('fetchStudents', requestedStudents)
+        }
       }
     }
   }

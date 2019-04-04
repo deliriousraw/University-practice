@@ -16,6 +16,7 @@ Vue.use(Vuex)
 const myPlugin = store => {
   store.subscribe((mutation, state) => {
     localStorage.setItem('store', JSON.stringify(state.students.students))
+    localStorage.setItem('requests', JSON.stringify(state.students.requests))
   })
 }
 

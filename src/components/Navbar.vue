@@ -48,7 +48,7 @@
         </v-navigation-drawer>
         <v-toolbar app dark color="primary">
             <v-toolbar-side-icon class="hidden-md-and-up" @click="sideNavVisibility = !sideNavVisibility"></v-toolbar-side-icon>
-            <v-toolbar-title>Students Pratice</v-toolbar-title>
+            <v-toolbar-title><v-btn flat to="/">Students Pratice</v-btn></v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items v-if="isUserLoggedIn" class="hidden-sm-and-down">
               <v-btn v-for="(link, index) in links.common"
