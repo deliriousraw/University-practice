@@ -3,23 +3,35 @@
     <v-layout row>
       <v-flex xs12>
         <h1>Новый Приказ</h1>
-          <v-select :items="faculties"
-                    v-model="facultyID"
-                    label="Факультет">
-          </v-select>
+        <v-layout>
+          <v-flex xs8 class="mr-5">
+            <v-select :items="faculties"
+                      v-model="facultyID"
+                      label="Факультет">
+            </v-select>
+          </v-flex>
+          <v-flex xs4>
+            <v-select v-if="facultyID !== null"
+                      :items="practices"
+                      v-model="practiceID"
+                      label="Практика">
+            </v-select>
+          </v-flex>
+        </v-layout>
+
           <v-layout row>
             <v-flex xs4 class="mr-5">
-              <v-select v-if="facultyID !== null"
-                        :items="departments"
-                        v-model="departmentID"
-                        label="Кафедра">
-              </v-select>
+              <v-autocomplete v-if="facultyID !== null"
+                              :items="departments"
+                              v-model="departmentID"
+                              label="Кафедра">
+              </v-autocomplete>
             </v-flex>
             <v-flex xs4 class="mr-5">
               <v-autocomplete v-if="facultyID !== null"
-                          v-model="groupID"
-                          :items="groups"
-                          label="Группа">
+                              v-model="groupID"
+                              :items="groups"
+                              label="Группа">
               </v-autocomplete>
             </v-flex>
             <v-flex xs4>
@@ -229,6 +241,7 @@ export default {
   data () {
     return {
       facultyID: null,
+      practiceID: null,
       departmentID: null,
       groupID: null,
       specialtyID: null,
@@ -348,16 +361,20 @@ export default {
       return sorted
     },
     textbeforeAPP () {
-      return `Згідно з навчальним  планом підготовки фахівців ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
+      // return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
+      return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2018-2019 н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів ${this.courseTextForApplication} курсу на переддипломну практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
     },
     faculty () {
       return this.facultyID !== null ? this.$store.getters.getFacultiesById(this.facultyID) : {name: ''}
+    },
+    practice () {
+      return this.practiceID !== null ? this.$store.getters.getPracticeById(this.practiceID) : {name: ''}
     },
     department () {
       return this.departmentID !== null ? this.$store.getters.getDepartmentById(this.departmentID) : {name: '', chief: ''}
@@ -373,15 +390,29 @@ export default {
         }
       })
     },
-    departments () {
-      let filteredDepartments = []
+    practices () {
+      let filteredPractices
       if (this.facultyID !== 'H8puzgFjjk2npeeda1UZ' && this.facultyID !== 'PTOfU3alUH3BKseCWHHt') {
-        filteredDepartments = this.$store.getters.departments.filter((department) => {
-          return department.facultyId === this.facultyID
-        })
+        filteredPractices = this.$store.getters.practices.filter((practice) => practice.facultyId === this.facultyID)
       } else {
-        filteredDepartments = this.$store.getters.departments
+        filteredPractices = this.$store.getters.practices
       }
+      return filteredPractices.map(practice => {
+        return {
+          text: practice.name,
+          value: practice.id
+        }
+      })
+    },
+    departments () {
+      let filteredDepartments = this.$store.getters.departments
+      // if (this.facultyID !== 'H8puzgFjjk2npeeda1UZ' && this.facultyID !== 'PTOfU3alUH3BKseCWHHt') {
+      //   filteredDepartments = this.$store.getters.departments.filter((department) => {
+      //     return department.facultyId === this.facultyID
+      //   })
+      // } else {
+      //   filteredDepartments = this.$store.getters.departments
+      // }
       return filteredDepartments.map(department => {
         return {
           text: department.name,
@@ -418,21 +449,27 @@ export default {
       return this.isMasters ? Number(this.groupCourse) - 4 : this.groupCourse
     },
     courseTextForApplication () {
-      switch (Number(this.groupCourse)) {
-        case 1 :
-          return 'першого'
-        case 2 :
-          return 'другого'
-        case 3 :
-          return 'третього'
-        case 4 :
-          return 'четвертого'
-        case 5 :
-          return 'першого'
-        case 6 :
-          return 'другого'
-        default :
-          return ''
+      if (this.computedGroupList.length > 0) {
+        const group = this.computedGroupList[0]
+        const studentGroup = group.trim().split('-')
+        switch (Number(studentGroup[1])) {
+          case 1 :
+            return 'першого'
+          case 2 :
+            return 'другого'
+          case 3 :
+            return 'третього'
+          case 4 :
+            return 'четвертого'
+          case 5 :
+            return 'першого'
+          case 6 :
+            return 'другого'
+          default :
+            return ''
+        }
+      } else {
+        return ''
       }
     },
     facultyTextForApplication () {
@@ -803,6 +840,7 @@ export default {
     },
     facultyID () {
       this.departmentID = null
+      this.practiceID = null
       this.groupID = null
       this.groupCourse = ''
       this.groupNumber = ''

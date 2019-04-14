@@ -15,29 +15,43 @@
         </v-btn>
       </v-flex>
 
-      <v-layout row>
-        <v-flex xs12 >
+      <v-layout column>
+        <v-flex xs12>
           <v-select :items="faculties"
                     v-model="facultyID"
                     label="Факультет">
           </v-select>
         </v-flex>
+        <v-layout>
+          <v-flex xs6 class="mr-5">
+            <v-switch :label="`Техникум`"
+                      v-model="groupTeh">
+            </v-switch>
+          </v-flex>
 
-        <v-flex xs6>
-          <v-btn  class="success mb-3"
-                  v-if="!facultyID && !groupToSet"
-                  @click="checkUploadedStudents">
-                ПРОВЕРИТЬ СТУДЕНТОВ - КОНСОЛЬ!
-          </v-btn>
-        </v-flex>
+          <v-flex xs6>
+            <v-switch :label="`Магистры`"
+                      v-model="magisters">
+            </v-switch>
+          </v-flex>
+        </v-layout>
 
-        <v-flex xs6>
-          <v-btn  class="success mb-3"
-                  v-if="!facultyID && !groupToSet"
-                  @click="setGroups">
-                НАЗНАЧИТЬ ГРУППЫ в firebase
-          </v-btn>
-        </v-flex>
+        <v-layout>
+          <v-flex xs6>
+            <v-btn  class="success mb-3"
+                    v-if="facultyID && groupToSet"
+                    @click="checkUploadedStudents">
+                  ПРОВЕРИТЬ СТУДЕНТОВ - КОНСОЛЬ!
+            </v-btn>
+          </v-flex>
+          <v-flex xs6>
+            <v-btn  class="success mb-3"
+                    v-if="facultyID && groupToSet"
+                    @click="setGroups">
+                  НАЗНАЧИТЬ ГРУППЫ в firebase
+            </v-btn>
+          </v-flex>
+        </v-layout>
       </v-layout>
     </v-layout>
   </v-container>
@@ -49,7 +63,9 @@ export default {
   data () {
     return {
       groupToSet: null,
-      facultyID: null
+      facultyID: null,
+      groupTeh: false,
+      magisters: false
     }
   },
   mounted () {
@@ -120,15 +136,14 @@ export default {
       reader.readAsText(file)
     },
     setGroups () {
-      console.log('ok', this.groupToSet)
       const formatedGroupToSet = this.groupToSet.map(student => {
         const studentGroup = student.group.trim().split('-')
         return {
           name: student.name.trim().split(/[ ]+/g).join(' '),
           group_alias: studentGroup[0],
-          group_course: Number(studentGroup[1]) + 4,
+          group_course: this.magisters ? Number(studentGroup[1]) + 4 : Number(studentGroup[1]),
           group_number: Number(studentGroup[2]),
-          group_teh: Boolean(studentGroup[3])
+          group_teh: Boolean(studentGroup[3]) || this.groupTeh
         }
       })
       console.log('STUDENTS FROM FILE', formatedGroupToSet)
@@ -167,7 +182,42 @@ export default {
       return findedGroup.id ? findedGroup.id : null
     },
     checkUploadedStudents () {
-      // console.log('Students to upload', uploadedUsers)
+      console.log('ok', this.groupToSet)
+      const formatedGroupToSet = this.groupToSet.map(student => {
+        const studentGroup = student.group.trim().split('-')
+        return {
+          name: student.name.trim().split(/[ ]+/g).join(' '),
+          group_alias: studentGroup[0],
+          group_course: this.magisters ? Number(studentGroup[1]) + 4 : Number(studentGroup[1]),
+          group_number: Number(studentGroup[2]),
+          group_teh: Boolean(studentGroup[3]) || this.groupTeh
+        }
+      })
+      console.log('STUDENTS FROM FILE', formatedGroupToSet)
+
+      const notFindedinFIREBASE = formatedGroupToSet.filter(student => {
+        return !(this.students.find((globalStudent) => {
+          return globalStudent.fio.trim() === student.name
+        }))
+      })
+      console.log('NOT finded in Firebase', notFindedinFIREBASE)
+
+      let studentWithNewData = []
+      this.students.forEach(student => {
+        const studentData = formatedGroupToSet.find((formatedStudent) => {
+          return student.fio.toLowerCase().trim() === formatedStudent.name.toLowerCase() && student.groupID === null
+        })
+        if (studentData) {
+          studentWithNewData.push({
+            ...student,
+            groupID: this.findGroup(studentData.group_alias),
+            groupCourse: studentData.group_course,
+            groupNumber: studentData.group_number,
+            groupTeh: studentData.group_teh
+          })
+        }
+      })
+      console.log('Array with updated INFO', studentWithNewData)
     }
   }
 }

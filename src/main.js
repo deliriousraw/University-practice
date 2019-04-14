@@ -47,5 +47,6 @@ new Vue({
     this.$store.dispatch('fetchSpecialties')
     this.$store.dispatch('fetchKnowledgeBranches')
     this.$store.dispatch('fetchGroups')
+    this.$store.dispatch('fetchPractices')
   }
 })
