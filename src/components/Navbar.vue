@@ -130,6 +130,8 @@ export default {
             {title: 'Области знаний', icon: 'add', url: '/create/knowledge-branches'},
             {title: 'Группы', icon: 'add', url: '/create/groups'},
             {title: 'Студент', icon: 'add', url: '/create/students'},
+            {title: 'Загрузить студетов', icon: 'cloud_download', url: '/upload/students'},
+            {title: 'Назначить Группы', icon: 'cloud_upload', url: '/assign/groups'},
             {title: 'Практики', icon: 'add', url: '/create/practices'}
           ]
         }

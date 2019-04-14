@@ -47,8 +47,5 @@ new Vue({
     this.$store.dispatch('fetchSpecialties')
     this.$store.dispatch('fetchKnowledgeBranches')
     this.$store.dispatch('fetchGroups')
-    if (!localStorage.getItem('store')) {
-      this.$store.dispatch('fetchALLStudents')
-    }
   }
 })

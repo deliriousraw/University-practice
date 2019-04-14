@@ -10,6 +10,9 @@ import ApplicationForm from '@/components/Reports/ApplicationForm.vue'
 import ReportForm from '@/components/Reports/ReportForm.vue'
 import StudentsList from '@/components/Students/StudentsList.vue'
 
+import UploadStudents from '@/components/Students/UploadStudents.vue'
+import AssignGroup from '@/components/Groups/AssignGroup.vue'
+
 import NewFaculty from '@/components/Faculties/NewFaculty.vue'
 import NewDepartments from '@/components/Departmens/NewDepartment.vue'
 import NewSpeciality from '@/components/Specialties/NewSpeciality.vue'
@@ -80,9 +83,21 @@ export default new Router({
       beforeEnter: AuthGuard
     },
     {
+      path: '/assign/groups',
+      name: 'AssignGroup',
+      component: AssignGroup,
+      beforeEnter: AuthGuard
+    },
+    {
       path: '/create/students',
       name: 'NewStudent',
       component: NewStudent,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/upload/students',
+      name: 'UploadStudents',
+      component: UploadStudents,
       beforeEnter: AuthGuard
     },
     {

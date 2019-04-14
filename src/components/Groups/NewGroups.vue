@@ -2,7 +2,7 @@
   <v-container>
     <v-layout row>
       <v-flex xs12 sm6 offset-sm3>
-        <h1 class="text--secondary mb-3">Добавить Новую Кафедру</h1>
+        <h1 class="text--secondary mb-3">Добавить Новую Группу</h1>
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field name="alias"
                         label="Алиас группы"
@@ -17,7 +17,7 @@
                         v-model="name">
           </v-text-field>
           <v-select :items="faculties"
-                    v-model="filterFacultyId"
+                    v-model="facultyId"
                     label="Факультет">
           </v-select>
         </v-form>
