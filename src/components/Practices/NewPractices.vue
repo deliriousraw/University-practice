@@ -15,12 +15,20 @@
                     v-model="facultyId"
                     label="Факультет">
           </v-select>
+          <v-select :items="faculties"
+                    v-model="filterFacultyId"
+                    label="Отфильтровать по факультету">
+          </v-select>
         </v-form>
         <v-btn :disabled="!valid"
                 class="success mb-3"
                 @click="createPractice">
               Добавить Практику
         </v-btn>
+        <!-- <v-btn class="success mb-3"
+                @click="uniquePractices">
+              Добавить все практики
+        </v-btn> -->
         <v-layout row>
           <v-flex xs12>
             <v-list>
@@ -51,7 +59,8 @@ export default {
     return {
       name: '',
       facultyId: null,
-      valid: false
+      valid: false,
+      filterFacultyId: null
     }
   },
   computed: {
@@ -64,7 +73,12 @@ export default {
       })
     },
     practices () {
-      return this.$store.getters.practices
+      return this.filterFacultyId
+        ? this.$store.getters.practices.filter(practice => practice.facultyId === this.filterFacultyId)
+        : this.$store.getters.practices
+    },
+    allUniquePractices () {
+      return [...new Set(this.$store.getters.practices.map(practice => practice.name))]
     }
   },
   methods: {
@@ -77,6 +91,16 @@ export default {
         this.$store.dispatch('createPractice', practice)
         this.clearFields()
       }
+    },
+    uniquePractices () {
+      this.allUniquePractices.forEach((item) => {
+        const practice = {
+          name: item,
+          facultyId: this.facultyId
+        }
+        console.log(practice)
+        // this.$store.dispatch('createPractice', practice)
+      })
     },
     clearFields () {
       this.name = ''

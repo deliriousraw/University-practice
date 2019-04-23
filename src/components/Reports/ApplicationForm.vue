@@ -11,11 +11,11 @@
             </v-select>
           </v-flex>
           <v-flex xs4>
-            <v-select v-if="facultyID !== null"
+            <v-autocomplete v-if="facultyID !== null"
                       :items="practices"
                       v-model="practiceID"
                       label="Практика">
-            </v-select>
+            </v-autocomplete>
           </v-flex>
         </v-layout>
 
@@ -362,10 +362,10 @@ export default {
     },
     textbeforeAPP () {
       // return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
-      return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2018-2019 н.р.`
+      return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» за спеціальністю ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2018-2019 н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів ${this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.isMasters ? '(магістрів 2018 року вступу)' : ''} ${this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
@@ -391,12 +391,13 @@ export default {
       })
     },
     practices () {
-      let filteredPractices
-      if (this.facultyID !== 'H8puzgFjjk2npeeda1UZ' && this.facultyID !== 'PTOfU3alUH3BKseCWHHt') {
-        filteredPractices = this.$store.getters.practices.filter((practice) => practice.facultyId === this.facultyID)
-      } else {
-        filteredPractices = this.$store.getters.practices
-      }
+      let filteredPractices = this.uniqueElementsBy(this.$store.getters.practices, (a, b) => a.name === b.name)
+      // if (this.facultyID !== 'H8puzgFjjk2npeeda1UZ' && this.facultyID !== 'PTOfU3alUH3BKseCWHHt') {
+      // if (this.facultyID !== null) {
+      //   filteredPractices = this.$store.getters.practices.filter((practice) => practice.facultyId === this.facultyID)
+      // } else {
+      //   filteredPractices = this.$store.getters.practices
+      // }
       return filteredPractices.map(practice => {
         return {
           text: practice.name,
@@ -443,6 +444,11 @@ export default {
       })
     },
     isMasters () {
+      if (this.computedGroupList.length > 0) {
+        const group = this.computedGroupList[0]
+        const studentGroup = group.trim().split('-')
+        return Number(studentGroup[1]) > 4
+      }
       return Number(this.groupCourse) > 4
     },
     courseForApplication () {
@@ -829,6 +835,12 @@ export default {
     formatNameReverse (name) {
       const nameArr = name.trim().split(' ')
       return `${nameArr[1].charAt(0)}. ${nameArr[2].charAt(0)}. ${nameArr[0]}`
+    },
+    uniqueElementsBy (arr, fn) {
+      return arr.reduce((acc, v) => {
+        if (!acc.some(x => fn(v, x))) acc.push(v)
+        return acc
+      }, [])
     }
   },
   watch: {
