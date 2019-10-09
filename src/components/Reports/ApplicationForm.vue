@@ -365,7 +365,7 @@ export default {
       return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» за спеціальністю ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2018-2019 н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів ${this.isMasters ? '(магістрів 2018 року вступу)' : ''} ${this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику, що виконують дипломну роботу по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.isMasters ? '(магістрів 2018 року вступу)' : ''} ${this.isMasters ? 'п\'ятого' : this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику ${this.courseTextForApplication === 'четвертого' ? ', що виконують дипломну роботу' : ''} по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}
@@ -468,7 +468,7 @@ export default {
           case 4 :
             return 'четвертого'
           case 5 :
-            return 'першого'
+            return "п'ятого"
           case 6 :
             return 'другого'
           default :
@@ -727,15 +727,15 @@ export default {
 
       const footerText = new docx.Paragraph('').pageBreakBefore().style('myStyles')
       const footerText1 = new docx.TextRun('Наказ вносить:').break()
-      const footerText2 = new docx.TextRun('Начальник ').break()
+      // const footerText2 = new docx.TextRun('Начальник ').break()
       footerText.addRun(footerText1)
-      footerText.addRun(footerText2)
+      // footerText.addRun(footerText2)
       doc.addParagraph(footerText)
 
-      const tableFooter = doc.createTable(6, 2).setWidth(docx.WidthType.PERCENTAGE, '105%')
+      const tableFooter = doc.createTable(8, 2).setWidth(docx.WidthType.PERCENTAGE, '105%')
 
       tableFooter.getCell(0, 0)
-        .addContent(new docx.Paragraph('навчально-методичного управління').style('myStyles'))
+        .addContent(new docx.Paragraph('Помічник проректора').style('myStyles'))
         .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
@@ -790,27 +790,55 @@ export default {
         .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(4, 0)
-        .addContent(new docx.Paragraph(`Декан ${this.facultyTextForApplication}`).style('myStyles'))
+        .addContent(new docx.Paragraph(' ').style('myStyles'))
         .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(4, 1)
-        .addContent(new docx.Paragraph(`${this.formatNameReverse(this.faculty.chief)}`).style('myStyles'))
+        .addContent(new docx.Paragraph(' ').style('myStyles'))
         .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(5, 0)
-        .addContent(new docx.Paragraph(`Завідувач кафедри ${this.department.name.toLowerCase()}`).style('myStyles'))
+        .addContent(new docx.Paragraph(`Декан ${this.facultyTextForApplication}`).style('myStyles'))
         .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
 
       tableFooter.getCell(5, 1)
+        .addContent(new docx.Paragraph(`${this.formatNameReverse(this.faculty.chief)}`).style('myStyles'))
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+
+      tableFooter.getCell(6, 0)
+        .addContent(new docx.Paragraph(' ').style('myStyles'))
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+
+      tableFooter.getCell(6, 1)
+        .addContent(new docx.Paragraph(' ').style('myStyles'))
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+
+      tableFooter.getCell(7, 0)
+        .addContent(new docx.Paragraph(`Завідувач кафедри ${this.department.name.toLowerCase()}`).style('myStyles'))
+        .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addStartBorder(docx.BorderStyle.SINGLE, 1, 'white')
+        .addEndBorder(docx.BorderStyle.SINGLE, 1, 'white')
+
+      tableFooter.getCell(7, 1)
         .addContent(new docx.Paragraph(`${this.formatNameReverse(this.department.chief)}`).style('myStyles'))
         .CellProperties.Borders.addTopBorder(docx.BorderStyle.SINGLE, 1, 'white')
         .addBottomBorder(docx.BorderStyle.SINGLE, 1, 'white')

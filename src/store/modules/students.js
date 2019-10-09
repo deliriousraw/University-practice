@@ -48,6 +48,9 @@ export default {
       editedStudent.practicePlace = payload.practicePlace
       editedStudent.practiceLeader = payload.practiceLeader
     },
+    deleteStudent (state, payload) {
+      state.students = state.students.filter(student => student.id !== payload.id)
+    },
     updatePracticeLeaders (state, payload) {
       payload.forEach((studentToUpdate) => {
         const editedStudent = state.students.find(student => {
@@ -66,6 +69,20 @@ export default {
         commit('createStudent', payload)
         commit('setLoading', false)
         console.log(students)
+      } catch (error) {
+        commit('setLoading', false)
+        commit('setError', error.message)
+        throw error
+      }
+    },
+    async deleteStudent ({commit}, payload) {
+      commit('clearError')
+      commit('setLoading', true)
+      try {
+        await fb.firestore().collection('students').doc(payload.id).delete()
+        console.log('deleted', payload.id)
+        commit('deleteStudent', payload)
+        commit('setLoading', false)
       } catch (error) {
         commit('setLoading', false)
         commit('setError', error.message)
@@ -150,7 +167,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const updated = await fb.firestore().collection('students').doc(payload.id).set({
+        await fb.firestore().collection('students').doc(payload.id).set({
           fio: payload.fio,
           facultyID: payload.facultyID,
           groupID: payload.groupID,
@@ -165,7 +182,7 @@ export default {
           practicePlace: payload.practicePlace,
           practiceLeader: payload.practiceLeader
         })
-        console.log(updated)
+        console.log('updated', payload.id)
         commit('updateStudent', payload)
         commit('setLoading', false)
       } catch (error) {

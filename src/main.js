@@ -32,9 +32,7 @@ new Vue({
       messagingSenderId: '1004958443341'
     }
 
-    fb.firestore(fb.initializeApp(config)).settings({
-      timestampsInSnapshots: true
-    })
+    fb.firestore(fb.initializeApp(config)).settings({timestampsInSnapshots: true})
 
     fb.auth().onAuthStateChanged(user => {
       if (user) {

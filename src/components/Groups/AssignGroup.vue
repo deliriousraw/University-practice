@@ -51,6 +51,18 @@
                   НАЗНАЧИТЬ ГРУППЫ в firebase
             </v-btn>
           </v-flex>
+          <v-flex xs6>
+            <v-btn  class="success mb-3"
+                    @click="deleteStudents">
+                  УДАЛИТЬ ПРОШЛОГОДНИХ СТУДЕНТОВ
+            </v-btn>
+          </v-flex>
+          <v-flex xs6>
+            <v-btn  class="success mb-3"
+                    @click="updateStudents">
+                  ДОБАВИТЬ ГОД ПРОШЛОГОДНИМ СТУДЕНТАМ
+            </v-btn>
+          </v-flex>
         </v-layout>
       </v-layout>
     </v-layout>
@@ -121,6 +133,34 @@ export default {
     triggerUpload () {
       this.$refs.fileInput.click()
     },
+    saveStudentsToJson () {
+      console.log(JSON.stringify(this.$store.getters.students, null, 2))
+    },
+    async deleteStudents () {
+      const bachelorsToDelete = this.students.filter(student => student.groupTeh === false && student.groupCourse === 4)
+      const techStudentsToDelete = this.students.filter(student => student.groupTeh === true && student.groupCourse === 3)
+
+      const studentsToDelete = bachelorsToDelete.concat(techStudentsToDelete)
+
+      for (let i = 0; i < studentsToDelete.length; i++) {
+        await this.$store.dispatch('deleteStudent', studentsToDelete[i])
+      }
+    },
+    async updateStudents () {
+      const bachelorsToUpdate = this.students.filter(student => student.groupTeh === false && student.groupCourse < 4)
+      const techStudentsToUpdate = this.students.filter(student => student.groupTeh === true && student.groupCourse < 3)
+
+      const studentsToUpdate = bachelorsToUpdate.concat(techStudentsToUpdate)
+
+      for (let i = 0; i < studentsToUpdate.length; i++) {
+        if (studentsToUpdate[i].groupCourse !== '' && typeof studentsToUpdate[i].groupCourse === 'number') {
+          await this.$store.dispatch('updateStudent', {
+            ...studentsToUpdate[i],
+            groupCourse: studentsToUpdate[i].groupCourse + 1
+          })
+        }
+      }
+    },
     onFileChange (event) {
       const file = event.target.files[0]
 
@@ -172,7 +212,7 @@ export default {
       })
       console.log('Array with updated INFO', studentWithNewData)
       studentWithNewData.forEach(student => {
-        this.$store.dispatch('updateStudent', student)
+
       })
     },
     findGroup (alias) {
