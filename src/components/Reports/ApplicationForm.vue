@@ -362,10 +362,10 @@ export default {
     },
     textbeforeAPP () {
       // return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» напряму ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на ${new Date().getFullYear()}-${new Date().getFullYear() + 1} н.р.`
-      return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» за спеціальністю ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2018-2019 н.р.`
+      return `Згідно з навчальним планом підготовки ОР «${this.isMasters ? 'Магістр' : 'Бакалавр'}» за спеціальністю ${this.specialty.code} «${this.specialty.name}» ${this.facultyTextForApplication} та графіку навчального процесу на 2019-2020 н.р.`
     },
     textafterAPP () {
-      return `1.Направити студентів ${this.isMasters ? '(магістрів 2018 року вступу)' : ''} ${this.isMasters ? 'п\'ятого' : this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику ${this.courseTextForApplication === 'четвертого' ? ', що виконують дипломну роботу' : ''} по кафедрі ${this.department.name.toLowerCase()}.`
+      return `1.Направити студентів ${this.isMasters ? '(магістрів 2019 року вступу)' : ''} ${this.isMasters ? 'п\'ятого' : this.courseTextForApplication} курсу на ${this.practice.name.toLowerCase()} практику ${this.courseTextForApplication === 'четвертого' ? ', що виконують дипломну роботу' : ''} по кафедрі ${this.department.name.toLowerCase()}.`
     },
     specialty () {
       return this.specialtyID !== null ? this.$store.getters.getSpecialtyById(this.specialtyID) : {code: '', name: ''}

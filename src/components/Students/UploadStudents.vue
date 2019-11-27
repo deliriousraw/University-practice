@@ -42,7 +42,26 @@ export default {
     }
   },
   computed: {
-
+    studentsFromStore () {
+      return this.$store.getters.students.map(student => {
+        return {
+          id: student.id,
+          fio: student.fio,
+          facultyID: student.facultyID,
+          groupID: student.groupID,
+          specialtyID: student.specialtyID,
+          groupCourse: student.groupCourse,
+          groupNumber: student.groupNumber,
+          groupTeh: student.groupTeh,
+          level: student.level,
+          studyForm: student.studyForm,
+          financing: student.financing,
+          startDate: student.startDate,
+          practicePlace: student.practicePlace,
+          practiceLeader: student.practiceLeader
+        }
+      })
+    }
   },
   methods: {
     triggerUpload () {
@@ -106,6 +125,16 @@ export default {
         }
         this.$store.dispatch('createStudent', studentInfo)
       })
+      // console.log('studentsToUpload', studentsToUpload, this.studentsFromStore)
+
+      // const resultred = studentsToUpload.filter(newStudent => !this.studentsFromStore.some(oldStudent => {
+      //   if (oldStudent.fio === newStudent.fio && oldStudent.facultyID === newStudent.facultyID && oldStudent.specialtyID === newStudent.specialtyID && oldStudent.groupTeh === newStudent.groupTeh && oldStudent.startDate === newStudent.startDate) {
+      //     return true
+      //   }
+      //   return false
+      // }))
+
+      // console.log('resultred', resultred)
     },
     checkUploadedStudents () {
       const uploadedUsers = this.dataFromJson.map((student, index) => {

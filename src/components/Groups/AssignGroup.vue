@@ -51,7 +51,7 @@
                   НАЗНАЧИТЬ ГРУППЫ в firebase
             </v-btn>
           </v-flex>
-          <v-flex xs6>
+          <!-- <v-flex xs6>
             <v-btn  class="success mb-3"
                     @click="deleteStudents">
                   УДАЛИТЬ ПРОШЛОГОДНИХ СТУДЕНТОВ
@@ -62,7 +62,7 @@
                     @click="updateStudents">
                   ДОБАВИТЬ ГОД ПРОШЛОГОДНИМ СТУДЕНТАМ
             </v-btn>
-          </v-flex>
+          </v-flex> -->
         </v-layout>
       </v-layout>
     </v-layout>
@@ -70,6 +70,8 @@
 </template>
 
 <script>
+// import studData from '../../../students.json'
+
 export default {
   name: 'AssignGroup',
   data () {
@@ -87,6 +89,9 @@ export default {
     }
   },
   computed: {
+    // dataFromJson () {
+    //   return studData
+    // },
     students () {
       return this.$store.getters.students.map(student => {
         return {
@@ -136,31 +141,39 @@ export default {
     saveStudentsToJson () {
       console.log(JSON.stringify(this.$store.getters.students, null, 2))
     },
-    async deleteStudents () {
-      const bachelorsToDelete = this.students.filter(student => student.groupTeh === false && student.groupCourse === 4)
-      const techStudentsToDelete = this.students.filter(student => student.groupTeh === true && student.groupCourse === 3)
+    // async deleteStudents () {
+    //   const bachelorsToDelete = this.students.filter(student => student.groupTeh === false && student.groupCourse === 4)
+    //   const techStudentsToDelete = this.students.filter(student => student.groupTeh === true && student.groupCourse === 3)
 
-      const studentsToDelete = bachelorsToDelete.concat(techStudentsToDelete)
+    //   const studentsToDelete = bachelorsToDelete.concat(techStudentsToDelete)
 
-      for (let i = 0; i < studentsToDelete.length; i++) {
-        await this.$store.dispatch('deleteStudent', studentsToDelete[i])
-      }
-    },
-    async updateStudents () {
-      const bachelorsToUpdate = this.students.filter(student => student.groupTeh === false && student.groupCourse < 4)
-      const techStudentsToUpdate = this.students.filter(student => student.groupTeh === true && student.groupCourse < 3)
+    //   for (let i = 0; i < studentsToDelete.length; i++) {
+    //     try {
+    //       await this.$store.dispatch('deleteStudent', studentsToDelete[i])
+    //     } catch (e) {
+    //       console.log(e, studentsToDelete[i])
+    //     }
+    //   }
+    // },
+    // async updateStudents () {
+    //   const bachelorsToUpdate = this.dataFromJson.filter(student => student.groupTeh === false && student.groupCourse < 4)
+    //   const techStudentsToUpdate = this.dataFromJson.filter(student => student.groupTeh === true && student.groupCourse < 3)
 
-      const studentsToUpdate = bachelorsToUpdate.concat(techStudentsToUpdate)
+    //   const studentsToUpdate = bachelorsToUpdate.concat(techStudentsToUpdate)
+    //   const studentsWithUpdatedInfo = studentsToUpdate.map(student => {
+    //     if (student.groupCourse !== '' && typeof student.groupCourse === 'number') {
+    //       return {
+    //         ...student,
+    //         groupCourse: student.groupCourse + 1
+    //       }
+    //     }
+    //     return student
+    //   })
 
-      for (let i = 0; i < studentsToUpdate.length; i++) {
-        if (studentsToUpdate[i].groupCourse !== '' && typeof studentsToUpdate[i].groupCourse === 'number') {
-          await this.$store.dispatch('updateStudent', {
-            ...studentsToUpdate[i],
-            groupCourse: studentsToUpdate[i].groupCourse + 1
-          })
-        }
-      }
-    },
+    //   for (let i = 0; i < studentsWithUpdatedInfo.length; i++) {
+    //     await this.$store.dispatch('updateStudent', studentsWithUpdatedInfo[i])
+    //   }
+    // },
     onFileChange (event) {
       const file = event.target.files[0]
 

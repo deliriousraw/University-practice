@@ -34,19 +34,21 @@ export default {
       const editedStudent = state.students.find(student => {
         return student.id === payload.id
       })
-      editedStudent.fio = payload.fio
-      editedStudent.facultyID = payload.facultyID
-      editedStudent.groupID = payload.groupID
-      editedStudent.specialtyID = payload.specialtyID
-      editedStudent.groupCourse = payload.groupCourse
-      editedStudent.groupNumber = payload.groupNumber
-      editedStudent.groupTeh = payload.groupTeh
-      editedStudent.level = payload.level
-      editedStudent.studyForm = payload.studyForm
-      editedStudent.financing = payload.financing
-      editedStudent.startDate = payload.startDate
-      editedStudent.practicePlace = payload.practicePlace
-      editedStudent.practiceLeader = payload.practiceLeader
+      if (editedStudent) {
+        editedStudent.fio = payload.fio
+        editedStudent.facultyID = payload.facultyID
+        editedStudent.groupID = payload.groupID
+        editedStudent.specialtyID = payload.specialtyID
+        editedStudent.groupCourse = payload.groupCourse
+        editedStudent.groupNumber = payload.groupNumber
+        editedStudent.groupTeh = payload.groupTeh
+        editedStudent.level = payload.level
+        editedStudent.studyForm = payload.studyForm
+        editedStudent.financing = payload.financing
+        editedStudent.startDate = payload.startDate
+        editedStudent.practicePlace = payload.practicePlace
+        editedStudent.practiceLeader = payload.practiceLeader
+      }
     },
     deleteStudent (state, payload) {
       state.students = state.students.filter(student => student.id !== payload.id)
