@@ -6,6 +6,8 @@ import Home from '@/components/Home.vue'
 import Login from '@/components/Auth/Login.vue'
 import Register from '@/components/Auth/Register.vue'
 
+import DownloadBackup from '@/components/Backup/DownloadBackup.vue'
+
 import ApplicationForm from '@/components/Reports/ApplicationForm.vue'
 import ReportForm from '@/components/Reports/ReportForm.vue'
 import StudentsList from '@/components/Students/StudentsList.vue'
@@ -39,6 +41,11 @@ export default new Router({
       path: '/register',
       name: 'register',
       component: Register
+    },
+    {
+      path: '/back-ups',
+      name: 'backups',
+      component: DownloadBackup
     },
     {
       path: '/create/application',

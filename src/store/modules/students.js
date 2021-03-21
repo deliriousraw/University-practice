@@ -1,5 +1,7 @@
 import firebase from 'firebase/app'
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 export default {
   state: {
     students: [],
@@ -67,10 +69,10 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const students = await firebase.firestore().collection('students').add(payload)
+        await firebase.firestore().collection('students').add(payload)
+        await sleep(100)
         commit('createStudent', payload)
         commit('setLoading', false)
-        console.log(students)
       } catch (error) {
         commit('setLoading', false)
         commit('setError', error.message)

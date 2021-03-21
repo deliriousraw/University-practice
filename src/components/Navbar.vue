@@ -132,7 +132,8 @@ export default {
             {title: 'Студент', icon: 'add', url: '/create/students'},
             {title: 'Загрузить студетов', icon: 'cloud_download', url: '/upload/students'},
             {title: 'Назначить Группы', icon: 'cloud_upload', url: '/assign/groups'},
-            {title: 'Практики', icon: 'add', url: '/create/practices'}
+            {title: 'Практики', icon: 'add', url: '/create/practices'},
+            {title: 'Бэкапы', icon: 'cloud_download', url: '/back-ups'},
           ]
         }
       } else {
