@@ -1,4 +1,4 @@
-import * as fb from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   state: {
@@ -17,7 +17,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const knowledgeBranches = await fb.firestore().collection('knowledgeBranches').add(payload)
+        const knowledgeBranches = await firebase.firestore().collection('knowledgeBranches').add(payload)
         commit('createKnowledgeBranch', payload)
         commit('setLoading', false)
         console.log(knowledgeBranches)
@@ -32,7 +32,7 @@ export default {
       commit('setLoading', true)
       try {
         let knowledgeBranches = []
-        await fb.firestore().collection('knowledgeBranches').get().then((querySnapshot) => {
+        await firebase.firestore().collection('knowledgeBranches').get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             knowledgeBranches.push({
               id: doc.id,

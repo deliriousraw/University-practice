@@ -1,4 +1,4 @@
-import * as fb from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   state: {
@@ -17,7 +17,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const faculties = await fb.firestore().collection('faculties').add(payload)
+        const faculties = await firebase.firestore().collection('faculties').add(payload)
         console.log(faculties)
       } catch (error) {
         commit('setLoading', false)
@@ -30,7 +30,7 @@ export default {
       commit('setLoading', true)
       try {
         let faculties = []
-        await fb.firestore().collection('faculties').get().then((querySnapshot) => {
+        await firebase.firestore().collection('faculties').get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             faculties.push({
               id: doc.id,

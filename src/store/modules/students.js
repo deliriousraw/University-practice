@@ -1,4 +1,4 @@
-import * as fb from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   state: {
@@ -67,7 +67,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const students = await fb.firestore().collection('students').add(payload)
+        const students = await firebase.firestore().collection('students').add(payload)
         commit('createStudent', payload)
         commit('setLoading', false)
         console.log(students)
@@ -81,7 +81,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        await fb.firestore().collection('students').doc(payload.id).delete()
+        await firebase.firestore().collection('students').doc(payload.id).delete()
         console.log('deleted', payload.id)
         commit('deleteStudent', payload)
         commit('setLoading', false)
@@ -97,7 +97,7 @@ export default {
       commit('addRequest', payload)
       try {
         let students = []
-        await fb.firestore().collection('students')
+        await firebase.firestore().collection('students')
           .where('facultyID', '==', payload.facultyID)
           .where('groupID', '==', payload.groupID)
           .where('groupCourse', '==', Number(payload.groupCourse))
@@ -136,7 +136,7 @@ export default {
       commit('setLoading', true)
       try {
         let students = []
-        await fb.firestore().collection('students').get().then((querySnapshot) => {
+        await firebase.firestore().collection('students').get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             students.push({
               id: doc.id,
@@ -169,7 +169,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        await fb.firestore().collection('students').doc(payload.id).set({
+        await firebase.firestore().collection('students').doc(payload.id).set({
           fio: payload.fio,
           facultyID: payload.facultyID,
           groupID: payload.groupID,
@@ -198,7 +198,7 @@ export default {
       commit('setLoading', true)
       try {
         await payload.forEach((student) => {
-          fb.firestore().collection('students').doc(student.id).update({
+          firebase.firestore().collection('students').doc(student.id).update({
             practiceLeader: student.practiceLeader
           })
         })

@@ -4,7 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-import * as fb from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
@@ -32,9 +34,9 @@ new Vue({
       messagingSenderId: '1004958443341'
     }
 
-    fb.firestore(fb.initializeApp(config)).settings({timestampsInSnapshots: true})
+    firebase.firestore(firebase.initializeApp(config)).settings({timestampsInSnapshots: true})
 
-    fb.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.$store.dispatch('autoLoginUser', user)
       }

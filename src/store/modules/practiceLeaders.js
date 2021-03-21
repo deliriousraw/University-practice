@@ -1,4 +1,4 @@
-import * as fb from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   state: {
@@ -17,7 +17,7 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        await fb.firestore().collection('practiceLeaders').add(payload)
+        await firebase.firestore().collection('practiceLeaders').add(payload)
         commit('createPracticeLeader', payload)
         commit('setLoading', false)
       } catch (error) {
@@ -31,7 +31,7 @@ export default {
       commit('setLoading', true)
       try {
         let practiceLeaders = []
-        await fb.firestore().collection('practiceLeaders').get().then((querySnapshot) => {
+        await firebase.firestore().collection('practiceLeaders').get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             practiceLeaders.push({
               id: doc.id,
