@@ -1,9 +1,9 @@
-import store from '../store/index'
+import firebase from 'firebase/app'
 
 export default function (to, from, next) {
-  if (store.getters.user) {
-    next()
-  } else {
+  if (!firebase.auth().currentUser) {
     next('/login?loginError=true')
+  } else {
+    next()
   }
 }

@@ -7,7 +7,7 @@
          data-a-h="center"
          data-a-v="center">
         <tr><td colspan="9" contenteditable="true" data-a-h="center" data-f-sz="14" data-f-bold="true">Практика студентів НТУ</td></tr>
-        <tr><td colspan="9" contenteditable="true" data-a-h="center" data-f-sz="12">2018 -  2019 навчальний рік</td></tr>
+        <tr><td colspan="9" contenteditable="true" data-a-h="center" data-f-sz="12">2020 -  2021 навчальний рік</td></tr>
         <tr><td colspan="9" contenteditable="true" data-a-h="center">Бакалаври</td></tr>
         <tr><td colspan="9" contenteditable="true" data-a-h="center" data-f-bold="true">Кафедра {{department.name}}</td></tr>
         <tr>

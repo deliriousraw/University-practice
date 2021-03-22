@@ -14,40 +14,25 @@ Vue.use(Vuetify)
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  store,
-  components: { App },
-  template: '<App/>',
-  beforeCreate () {
-    this.$store.commit('initialiseStore')
-  },
-  created () {
-    var config = {
-      apiKey: 'AIzaSyAy7nr1mhEESekmox9B1Pw6GXKKphSRt1k',
-      authDomain: 'student-practice-cc645.firebaseapp.com',
-      databaseURL: 'https://student-practice-cc645.firebaseio.com',
-      projectId: 'student-practice-cc645',
-      storageBucket: 'student-practice-cc645.appspot.com',
-      messagingSenderId: '1004958443341'
-    }
+const config = {
+  apiKey: 'AIzaSyAy7nr1mhEESekmox9B1Pw6GXKKphSRt1k',
+  authDomain: 'student-practice-cc645.firebaseapp.com',
+  databaseURL: 'https://student-practice-cc645.firebaseio.com',
+  projectId: 'student-practice-cc645',
+  storageBucket: 'student-practice-cc645.appspot.com',
+  messagingSenderId: '1004958443341'
+}
 
-    firebase.firestore(firebase.initializeApp(config)).settings({timestampsInSnapshots: true})
+firebase.firestore(firebase.initializeApp(config)).settings({timestampsInSnapshots: true})
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.$store.dispatch('autoLoginUser', user)
-      }
-    })
+let app
 
-    this.$store.dispatch('fetchFaculties')
-    this.$store.dispatch('fetchDepartments')
-    this.$store.dispatch('fetchSpecialties')
-    this.$store.dispatch('fetchKnowledgeBranches')
-    // this.$store.dispatch('fetchPracticeLeaders')
-    this.$store.dispatch('fetchGroups')
-    this.$store.dispatch('fetchPractices')
+firebase.auth().onAuthStateChanged(user => {
+  if (!app) {
+    app = new Vue({
+      router,
+      store,
+      render: h => h(App)
+    }).$mount('#app')
   }
 })

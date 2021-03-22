@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import studGroups from './students.json'
+
 export default {
   name: 'UploadStudents',
   data () {
@@ -81,16 +83,13 @@ export default {
       }
       reader.readAsText(file)
     },
-    findUserThatNotInDB () {
+    async findUserThatNotInDB () {
       const uploadedUsers = this.$store.getters.students
       const notINBASE = this.dataFromJson.filter((student) => {
-        return !(uploadedUsers.some(uploadedStudent => uploadedStudent.fio === student.fio.trim()))
+        return !(uploadedUsers.some(uploadedStudent => uploadedStudent.fio.trim() === student.fio.trim()))
       })
-      const notIN = notINBASE.filter(student => !(student.fio.includes('`')))
-      alert(notIN)
-    },
-    uploadStudents () {
-      this.dataFromJson.forEach((student, index) => {
+
+      const newUploadedUsers = notINBASE.map((student, index) => {
         const studentStartDate = student.startdate.split('/')
         const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
         const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
@@ -107,14 +106,27 @@ export default {
           return faculty.name === student.department
         })
         const isGroupTech = student.isShortTerm === 'Так'
+        const realCourse = Number(student.course)
+
+        const data = studGroups.find((item) => item.fio.trim() === student.fio.trim())
+
+        let group = ''
+        let groupNumber = ''
+        if (data) { 
+            const groupItem = this.$store.getters.groups.find(group => {
+                return group.facultyId === realFacultyID.id && group.alias === data.alias
+            })
+            group = groupItem && groupItem.id || null
+            groupNumber = Number(data.groupNumber) || ''
+        }
 
         const studentInfo = {
           fio: student.fio,
           facultyID: realFacultyID.id,
-          groupID: null,
+          groupID: group,
           specialtyID: realspecialtyID,
-          groupCourse: '',
-          groupNumber: '',
+          groupCourse: realCourse,
+          groupNumber: groupNumber,
           practicePlace: '',
           practiceLeader: '',
           groupTeh: isGroupTech,
@@ -123,20 +135,71 @@ export default {
           financing: student.financing,
           startDate: realDay
         }
-        this.$store.dispatch('createStudent', studentInfo)
+        return studentInfo
       })
-      // console.log('studentsToUpload', studentsToUpload, this.studentsFromStore)
+      console.log(newUploadedUsers)
+      for (let i = 0; i < newUploadedUsers.length; i++) {
+        await this.$store.dispatch('createStudent', newUploadedUsers[i])
+        console.log('ok')
+      }
+    },
+    async uploadStudents () {
+        const uploadedUsers = this.dataFromJson.map((student, index) => {
+        const studentStartDate = student.startdate.split('/')
+        const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
+        const day = studentStartDate[1] < 10 ? '0' + studentStartDate[1] : studentStartDate[1]
+        const year = '20' + studentStartDate[2]
+        const realDay = `${year}-${month}-${day}`
 
-      // const resultred = studentsToUpload.filter(newStudent => !this.studentsFromStore.some(oldStudent => {
-      //   if (oldStudent.fio === newStudent.fio && oldStudent.facultyID === newStudent.facultyID && oldStudent.specialtyID === newStudent.specialtyID && oldStudent.groupTeh === newStudent.groupTeh && oldStudent.startDate === newStudent.startDate) {
-      //     return true
-      //   }
-      //   return false
-      // }))
+        const realspecialty = this.$store.getters.specialties.find(speciality => {
+          const splittedSpecialty = student.speciality.split(' ')
+          return speciality.code === splittedSpecialty[0]
+        })
+        const realspecialtyID = realspecialty ? realspecialty.id : null
 
-      // console.log('resultred', resultred)
+        const realFacultyID = this.$store.getters.faculties.find(faculty => {
+          return faculty.name === student.department
+        })
+        const isGroupTech = student.isShortTerm === 'Так'
+        const realCourse = Number(student.course)
+
+        const data = studGroups.find((item) => item.fio.trim() === student.fio.trim())
+
+        let group = ''
+        let groupNumber = ''
+        if (data) { 
+            const groupItem = this.$store.getters.groups.find(group => {
+                return group.facultyId === realFacultyID.id && group.alias === data.alias
+            })
+            group = groupItem && groupItem.id || null
+            groupNumber = Number(data.groupNumber) || ''
+        }
+
+        const studentInfo = {
+          fio: student.fio,
+          facultyID: realFacultyID.id,
+          groupID: group,
+          specialtyID: realspecialtyID,
+          groupCourse: realCourse,
+          groupNumber: groupNumber,
+          practicePlace: '',
+          practiceLeader: '',
+          groupTeh: isGroupTech,
+          level: student.level,
+          studyForm: student.studyForm,
+          financing: student.financing,
+          startDate: realDay
+        }
+        return studentInfo
+      })
+      console.log(uploadedUsers)
+      for (let i = 0; i < uploadedUsers.length; i++) {
+        await this.$store.dispatch('createStudent', uploadedUsers[i])
+        console.log('ok')
+      }
     },
     checkUploadedStudents () {
+      const notFounded = []
       const uploadedUsers = this.dataFromJson.map((student, index) => {
         const studentStartDate = student.startdate.split('/')
         const month = studentStartDate[0] < 10 ? '0' + studentStartDate[0] : studentStartDate[0]
@@ -154,14 +217,30 @@ export default {
           return faculty.name === student.department
         })
         const isGroupTech = student.isShortTerm === 'Так'
+        const realCourse = Number(student.course)
+
+        const data = studGroups.find((item) => item.fio.trim() === student.fio.trim())
+
+        let group = ''
+        let groupNumber = ''
+        if (data) { 
+            const groupItem = this.$store.getters.groups.find(group => {
+                return group.facultyId === realFacultyID.id && group.alias === data.alias
+            })
+            if (!groupItem) {
+                notFounded.push(student)
+            }
+            group = groupItem && groupItem.id || null
+            groupNumber = Number(data.groupNumber) || ''
+        }
 
         const studentInfo = {
           fio: student.fio,
           facultyID: realFacultyID.id,
-          groupID: null,
+          groupID: group,
           specialtyID: realspecialtyID,
-          groupCourse: '',
-          groupNumber: '',
+          groupCourse: realCourse,
+          groupNumber: groupNumber,
           practicePlace: '',
           practiceLeader: '',
           groupTeh: isGroupTech,
@@ -173,20 +252,8 @@ export default {
         return studentInfo
       })
       console.log('Students to upload', uploadedUsers)
+      console.log(JSON.stringify(notFounded, null, 2), notFounded.length)
     }
-    // formatJson (text) {
-    //   // preserve newlines, etc - use valid JSON
-    //   const replacedText = text.replace(/\\n/g, "\\n")
-    //     .replace(/\\'/g, "\\'")
-    //     .replace(/\\"/g, '\\"')
-    //     .replace(/\\&/g, "\\&")
-    //     .replace(/\\r/g, "\\r")
-    //     .replace(/\\t/g, "\\t")
-    //     .replace(/\\b/g, "\\b")
-    //     .replace(/\\f/g, "\\f")
-    //   // // remove non-printable and other non-valid JSON chars
-    //   return replacedText.replace(/[\u0000-\u0019]+/g, "")
-    // }
   }
 
 }

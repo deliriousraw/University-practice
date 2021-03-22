@@ -72,7 +72,14 @@ export default {
         }
         this.$store.dispatch('loginUser', user)
         .then(() => {
-          this.$router.push('/')
+            this.$router.push('/')
+            this.$store.dispatch('fetchFaculties')    
+            this.$store.dispatch('fetchDepartments')
+            this.$store.dispatch('fetchSpecialties')
+            this.$store.dispatch('fetchKnowledgeBranches')
+            // this.$store.dispatch('fetchPracticeLeaders')
+            this.$store.dispatch('fetchGroups')
+            this.$store.dispatch('fetchPractices')
         })
         .catch(() => {})
       }
